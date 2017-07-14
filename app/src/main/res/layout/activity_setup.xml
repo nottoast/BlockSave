@@ -43,9 +43,10 @@ android:paddingTop="16dp">
             android:layout_width="123dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:layout_weight="0.89"
             android:ems="10"
-            android:inputType="date"
-            android:layout_weight="0.89" />
+            android:hint="dd/mm/yyyy"
+            android:inputType="date" />
 
     </LinearLayout>
 
@@ -70,7 +71,7 @@ android:paddingTop="16dp">
             android:layout_height="30sp"
             android:layout_marginTop="10dp"
             android:layout_weight="1"
-            android:text="£"
+            android:text="$"
             android:textSize="18sp" />
 
         <EditText
@@ -100,7 +101,7 @@ android:paddingTop="16dp">
             android:layout_height="wrap_content"
             android:layout_weight="0.43"
             android:paddingLeft="135dp"
-            android:text="A block is worth  £ 0.00"
+            android:text="A block is worth  $ 0.00"
             android:textSize="18sp"
             android:textStyle="italic" />
     </LinearLayout>
@@ -116,9 +117,9 @@ android:paddingTop="16dp">
 
         <Button
             android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="170dp"
+            android:layout_marginLeft="160dp"
             android:layout_marginTop="12dp"
             android:text="Save and continue" />
 

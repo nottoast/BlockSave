@@ -24,7 +24,7 @@ public class SetupActivity extends AppCompatActivity {
     public static int BLOCKS_PER_DAY = 10;
     private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol() + " ";
 
-    private double totalMoneyToSpend = 0.0;
+    private float totalMoneyToSpend = 0.0F;
     private long nextPayDay = Calendar.getInstance().getTimeInMillis();
     private long setupDate = Calendar.getInstance().getTimeInMillis();
 
@@ -95,7 +95,7 @@ public class SetupActivity extends AppCompatActivity {
                         nextPayDay = date.getTime();
                     }
                     try {
-                        totalMoneyToSpend = Double.parseDouble(budget.getText().toString());
+                        totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
                     } catch (Exception ex) {
                     }
                     saveData();
@@ -107,10 +107,22 @@ public class SetupActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         budget.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View view, int keyCode, KeyEvent event) {
                 try {
-                    totalMoneyToSpend = Double.parseDouble(budget.getText().toString());
+                    totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
+                } catch (Exception ex) {
+                }
+                calculateAndDisplayData();
+                return false;
+            }
+        });
+
+        payDay.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View view, int keyCode, KeyEvent event) {
+                try {
+                    totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
                 } catch (Exception ex) {
                 }
                 calculateAndDisplayData();
@@ -121,6 +133,7 @@ public class SetupActivity extends AppCompatActivity {
 
     private void findSetupScreenElements() {
         payDay = (EditText) findViewById(R.id.payDay);
+        payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
         budget = (EditText) findViewById(R.id.budget);
         budget.setText("" + totalMoneyToSpend);
         saveButton = (Button) findViewById(R.id.saveButton);
@@ -131,7 +144,7 @@ public class SetupActivity extends AppCompatActivity {
 
     private void loadData() {
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
-        totalMoneyToSpend = Double.valueOf(preferences.getString("total_money_to_spend", "0"));
+        totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         setupDate = preferences.getLong("setup_day", 0L);
     }
@@ -140,8 +153,8 @@ public class SetupActivity extends AppCompatActivity {
         setupDate = Calendar.getInstance().getTimeInMillis();
         SharedPreferences settings = getSharedPreferences("block_save_data", 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("total_money_to_spend", totalMoneyToSpend + "");
-        editor.putString("current_money_to_spend", totalMoneyToSpend + "");
+        editor.putFloat("total_money_to_spend", totalMoneyToSpend);
+        editor.putFloat("current_money_to_spend", totalMoneyToSpend);
         editor.putLong("next_pay_day", nextPayDay);
         editor.putLong("setup_day", setupDate);
         editor.putBoolean("help_visited", true);
@@ -149,10 +162,18 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void calculateAndDisplayData() {
-        DecimalFormat formatter = new DecimalFormat("##.00");
-        int daysDifference = Utils.getDaysDifference(setupDate, nextPayDay);
-        String staticBlockPrice = formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
-        payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
-        blockValueText.setText(BLOCK_VALUE_TEMPLATE_TEXT_GBP + staticBlockPrice);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            nextPayDay = sdf.parse(payDay.getText().toString()).getTime();
+            DecimalFormat formatter = new DecimalFormat("##.00");
+            int daysDifference = Utils.getDaysDifference(setupDate, nextPayDay);
+            String staticBlockPrice = formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
+            if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
+                staticBlockPrice = "0.00";
+            }
+            blockValueText.setText(BLOCK_VALUE_TEMPLATE_TEXT_GBP + staticBlockPrice);
+        } catch(Exception ex) {
+
+        }
     }
 }

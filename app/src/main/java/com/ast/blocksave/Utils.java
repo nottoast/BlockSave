@@ -30,9 +30,11 @@ public class Utils {
         System.out.println("------------------------------------------------------");
         System.out.println(getNumberOfDaysUntilPayDay(payDate.getTime()));
         System.out.println(getDayNumber(setupDate.getTime()));
-        System.out.println("-----------------------------------------------------");
+        System.out.println("------------------------------------------------------");
         System.out.println(getUnderSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
         System.out.println(getOverSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
+        System.out.println("------------------------------------------------------");
+        //System.out.println(getBlocksToDeduct(300.0F, 292.50, staticBlockPrice));
     }
 
     public static int getNumberOfDaysUntilPayDay(long nextPayDay) {
@@ -64,18 +66,20 @@ public class Utils {
         return staticBlockPrice;
     }
 
-    public static int getBlocksToDisplay(double totalMoneyToSpend, double currentMoneyToSpend, long setupDay, double staticBlockPrice) {
+    public static long getBlocksToDisplay(double totalMoneyToSpend, double currentMoneyToSpend, long setupDay, double staticBlockPrice) {
         int daysPassed = getDayNumber(setupDay);
-        Integer totalBlocksAvailableInteger = Integer.valueOf(((Double) ((totalMoneyToSpend) / staticBlockPrice)).intValue()) - (daysPassed * BLOCKS_PER_DAY);
-        Integer currentBlocksAvailableInteger = Integer.valueOf(((Double) ((currentMoneyToSpend) / staticBlockPrice)).intValue()) - (daysPassed * BLOCKS_PER_DAY);
-        Integer blocksToDisplay = BLOCKS_PER_DAY - (totalBlocksAvailableInteger - currentBlocksAvailableInteger);
+        double totalBlocksAvailableInteger = ((totalMoneyToSpend) / staticBlockPrice) - (daysPassed * BLOCKS_PER_DAY);
+        double currentBlocksAvailableInteger = ((currentMoneyToSpend) / staticBlockPrice) - (daysPassed * BLOCKS_PER_DAY);
+        long blocksToDisplay = Math.round(BLOCKS_PER_DAY - (totalBlocksAvailableInteger - currentBlocksAvailableInteger));
         return blocksToDisplay;
     }
 
-    public static int getTomorrowBlocksToDisplay(long setupDay, long payDate, double currentMoneyToSpend,  double staticBlockPrice) {
+    public static long getTomorrowBlocksToDisplay(long setupDay, long payDate, double currentMoneyToSpend,  double staticBlockPrice) {
         int daysPassed = getDayNumber(setupDay);
-        Integer currentBlocksAvailableInteger = Integer.valueOf(((Double) ((currentMoneyToSpend) / staticBlockPrice)).intValue()) - ((daysPassed - 1) * BLOCKS_PER_DAY);
-        Integer blocksToDisplay = (currentBlocksAvailableInteger / getNumberOfDaysUntilPayDay(payDate));
+        double currentBlocksAvailable = ((currentMoneyToSpend) / staticBlockPrice);
+        double currentBlocksAvailableAdjusted = currentBlocksAvailable - ((daysPassed + 1) * BLOCKS_PER_DAY);
+        double numberOfDaysUntilPayDay = getNumberOfDaysUntilPayDay(payDate);
+        long blocksToDisplay = Math.round(currentBlocksAvailableAdjusted / (numberOfDaysUntilPayDay - 1));
         return blocksToDisplay;
     }
 
@@ -87,13 +91,14 @@ public class Utils {
         int daysDifference = getDaysDifference(setupDay, nextPayDate);
         double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
-        Integer currentBlocksAvailableInteger = Integer.valueOf(((Double) Math.ceil((currentMoneyToSpend) / staticBlockPrice)).intValue()) - (BLOCKS_PER_DAY * daysPassed);
-        int todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
-        int underSpendValue = 1;
-        int tomorrowsBlocks = todaysBlocks;
+        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
+        double currentBlocksAvailableAdjusted = currentBlocksAvailable - (BLOCKS_PER_DAY * daysPassed);
+        long todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
+        int underSpendValue = -1;
+        long tomorrowsBlocks = todaysBlocks;
         while(todaysBlocks == tomorrowsBlocks) {
             underSpendValue++;
-            tomorrowsBlocks = (currentBlocksAvailableInteger + underSpendValue) / (daysDifference - (daysPassed + 1));
+            tomorrowsBlocks = Math.round(currentBlocksAvailableAdjusted + underSpendValue) / (daysDifference - (daysPassed + 1));
             if (underSpendValue > 9999) {
                 break;
             }
@@ -105,17 +110,28 @@ public class Utils {
         int daysDifference = getDaysDifference(setupDay, nextPayDate);
         double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
-        Integer currentBlocksAvailableInteger = Integer.valueOf(((Double) ((currentMoneyToSpend) / staticBlockPrice)).intValue()) - (BLOCKS_PER_DAY * daysPassed);
-        int todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
-        int overSpendValue = 1;
-        int tomorrowsBlocks = todaysBlocks;
+        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
+        double currentBlocksAvailableAdjusted = currentBlocksAvailable - (BLOCKS_PER_DAY * daysPassed);
+        long todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
+        int overSpendValue = -1;
+        long tomorrowsBlocks = todaysBlocks;
         while(todaysBlocks == tomorrowsBlocks) {
             overSpendValue++;
-            tomorrowsBlocks = (currentBlocksAvailableInteger - overSpendValue) / (daysDifference - (daysPassed + 1));
+            tomorrowsBlocks = Math.round(currentBlocksAvailableAdjusted - overSpendValue) / (daysDifference - (daysPassed + 1));
             if (overSpendValue > 9999) {
                 break;
             }
         }
         return overSpendValue;
+    }
+
+    public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay) {
+        double currentBlocks = currentMoneyToSpend / staticBlockPrice;
+        double newBlocks = currentMoneyToSpend - purchaseAmount;
+        double newBlocksAdjusted = newBlocks / staticBlockPrice;
+
+        double newDisplayBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, staticBlockPrice);
+
+        return Math.round(currentBlocks - newBlocksAdjusted);
     }
 }

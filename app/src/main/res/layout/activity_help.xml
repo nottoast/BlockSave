@@ -11,7 +11,7 @@ android:paddingTop="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="325dp"
         android:layout_column="0"
         android:layout_marginTop="8dp"
         android:layout_row="0"
@@ -33,7 +33,7 @@ android:paddingTop="16dp">
             android:layout_marginTop="8dp"
             android:layout_weight="1.71"
             android:text="BlockSave is a simple way for you to save money. It simply takes two pieces of information from you, how much money you have to spend, and how long you need to make it last. "
-            android:textSize="16sp" />
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/textView12"
@@ -42,7 +42,7 @@ android:paddingTop="16dp">
             android:layout_marginTop="8dp"
             android:layout_weight="1.88"
             android:text="BlockSave will split your daily allowance into 10 blocks, which you are then free to spend as you wish. If you go over your allowance it will affect the budget for future days, likewise if you go under. "
-            android:textSize="16sp" />
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/textView14"
@@ -50,17 +50,17 @@ android:paddingTop="16dp">
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_weight="5.29"
-            android:text="Simply fill out the above details to get started!"
-            android:textSize="16sp" />
+            android:text="Simply continue and fill out the details to get started!"
+            android:textSize="17sp" />
     </LinearLayout>
 
     <Button
         android:id="@+id/continueButton1"
-        android:layout_width="wrap_content"
+        android:layout_width="181dp"
         android:layout_height="wrap_content"
         android:layout_column="0"
-        android:layout_marginLeft="170dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginLeft="160dp"
+        android:layout_marginTop="8dp"
         android:layout_row="1"
         android:text="Continue to setup" />
 </GridLayout>
