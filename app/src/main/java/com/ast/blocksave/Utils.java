@@ -34,7 +34,7 @@ public class Utils {
         System.out.println(getUnderSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
         System.out.println(getOverSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
         System.out.println("------------------------------------------------------");
-        //System.out.println(getBlocksToDeduct(300.0F, 292.50, staticBlockPrice));
+
     }
 
     public static int getNumberOfDaysUntilPayDay(long nextPayDay) {
@@ -126,12 +126,8 @@ public class Utils {
     }
 
     public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay) {
-        double currentBlocks = currentMoneyToSpend / staticBlockPrice;
-        double newBlocks = currentMoneyToSpend - purchaseAmount;
-        double newBlocksAdjusted = newBlocks / staticBlockPrice;
-
-        double newDisplayBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, staticBlockPrice);
-
-        return Math.round(currentBlocks - newBlocksAdjusted);
+        double currentDisplayedBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, staticBlockPrice);
+        double newDisplayBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend - purchaseAmount, setupDay, staticBlockPrice);
+        return Math.round(currentDisplayedBlocks - newDisplayBlocks);
     }
 }

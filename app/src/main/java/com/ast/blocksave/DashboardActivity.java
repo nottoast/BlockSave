@@ -3,6 +3,7 @@ package com.ast.blocksave;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,8 +18,6 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 
-import static android.R.color.holo_green_dark;
-
 public class DashboardActivity extends AppCompatActivity {
 
     private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() + " ";
@@ -30,7 +29,8 @@ public class DashboardActivity extends AppCompatActivity {
     private long nextPayDay = 0L;
     private long setupDay = 0L;
 
-    private LinearLayout blockDisplayLayout;
+    private LinearLayout blockDisplayLayoutTop;
+    private LinearLayout blockDisplayLayoutBottom;
     private TextView blocksToSpendToday;
     private TextView purchaseAmount;
     private TextView calculatedBlocks;
@@ -54,8 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
         boolean continueToLoadActivity = loadData();
         if(continueToLoadActivity) {
             if (Utils.getDaysDifference(setupDay, nextPayDay) < 1 || totalMoneyToSpend == 0.0) {
-                Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
-                startActivity(intent);
+                switchToSettingsScreen();
             }
             findDashboardScreenElements();
             calculateAndDisplayData();
@@ -94,6 +93,11 @@ public class DashboardActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void switchToSettingsScreen() {
+        Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
+        startActivity(intent);
     }
 
     private void addListeners() {
@@ -138,7 +142,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void findDashboardScreenElements() {
-        blockDisplayLayout = (LinearLayout) findViewById(R.id.blockDisplayLayout);
+        blockDisplayLayoutTop = (LinearLayout) findViewById(R.id.blockDisplayLayoutTop);
+        blockDisplayLayoutBottom = (LinearLayout) findViewById(R.id.blockDisplayLayoutBottom);
         blocksToSpendToday = (TextView) findViewById(R.id.blocksToSpendToday);
         purchaseAmount = (TextView) findViewById(R.id.purchaseAmount);
         purchaseButton = (Button) findViewById(R.id.purchaseButton);
@@ -151,13 +156,52 @@ public class DashboardActivity extends AppCompatActivity {
         blocksToSpendText = (TextView) findViewById(R.id.blocksToSpendText);
     }
 
+    private void displayBlocks(long numberOfBlocksToDisplay) {
+
+        for (int i = 0; i < 14; i++) {
+
+            TextView textView = null;
+
+            if ( (i % 2) == 0) {
+                textView = new TextView(blockDisplayLayoutTop.getContext());
+            } else {
+                textView = new TextView(blockDisplayLayoutBottom.getContext());
+            }
+
+            textView.setText("      ");
+            textView.setTextColor(Color.BLACK);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(20, 20, 0, 0);
+            Drawable drawable = null;
+            textView.setPadding(15, 15, 15, 15);
+            textView.setTextSize(17);
+            drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block);
+            textView.setBackground(drawable);
+
+            if ( (i % 2) == 0) {
+                blockDisplayLayoutTop.addView(textView, params);
+            } else {
+                blockDisplayLayoutBottom.addView(textView, params);
+            }
+
+        }
+
+    }
+
+    private void highlightBlocksForRemoval(long numberOfBlocksToHighlight) {
+
+    }
+
     private void calculateAndDisplayData() {
 
         DecimalFormat formatter = new DecimalFormat("##.00");
         int numberOfDaysUntilPayDay = Utils.getNumberOfDaysUntilPayDay(nextPayDay);
         double staticBlockPrice = Double.valueOf(formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, numberOfDaysUntilPayDay)));
+
+        Long blocksToDeduct = 0L;
+
         if (!purchaseAmount.getText().toString().isEmpty()) {
-            Long blocksToDeduct = Utils.getBlocksToDeduct(totalMoneyToSpend, currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString()), staticBlockPrice, setupDay);
+            blocksToDeduct = Utils.getBlocksToDeduct(totalMoneyToSpend, currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString()), staticBlockPrice, setupDay);
             calculatedBlocks.setText(blocksToDeduct + "");
         } else {
             calculatedBlocks.setText("0");
@@ -169,17 +213,14 @@ public class DashboardActivity extends AppCompatActivity {
             blocksToSpendText.setText(TODAYS_BLOCKS_NEGATIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
             blocksToSpendToday.setText(blocksToDisplay + "");
-
         } else if (blocksToDisplay > 0) {
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
             blocksToSpendToday.setText(blocksToDisplay + "");
-
         } else {
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
             blocksToSpendToday.setText("None");
-
         }
 
         int underSpend = Utils.getUnderSpendValue(setupDay, nextPayDay, totalMoneyToSpend, currentMoneyToSpend);
@@ -214,6 +255,13 @@ public class DashboardActivity extends AppCompatActivity {
         } else {
             tomorrowsBudgetOutput.setText(tomorrowsBudget + " blocks");
         }
+
+        if(tomorrowsBudget < 1) {
+            switchToSettingsScreen();
+        }
+
+        displayBlocks(blocksToDisplay);
+        highlightBlocksForRemoval(blocksToDeduct);
 
     }
 
