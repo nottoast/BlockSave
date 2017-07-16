@@ -171,6 +171,9 @@ public class SetupActivity extends AppCompatActivity {
             if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
                 staticBlockPrice = "0.00";
             }
+            if(Double.valueOf(staticBlockPrice) < 1.0) {
+                staticBlockPrice = "0" + staticBlockPrice;
+            }
             blockValueText.setText(BLOCK_VALUE_TEMPLATE_TEXT_GBP + staticBlockPrice);
         } catch(Exception ex) {
 

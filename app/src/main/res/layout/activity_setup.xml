@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:paddingBottom="16dp"
-android:paddingLeft="16dp"
-android:paddingRight="16dp"
-android:paddingTop="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp">
 
 
     <TextView
@@ -33,10 +34,10 @@ android:paddingTop="16dp">
             android:id="@+id/setupText1"
             android:layout_width="197dp"
             android:layout_height="wrap_content"
+            android:layout_weight="2.40"
             android:paddingRight="5dp"
             android:text="When do you next get paid?"
-            android:textSize="18sp"
-            android:layout_weight="2.40" />
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/payDay"

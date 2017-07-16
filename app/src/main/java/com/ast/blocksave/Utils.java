@@ -79,8 +79,8 @@ public class Utils {
         double currentBlocksAvailable = ((currentMoneyToSpend) / staticBlockPrice);
         double currentBlocksAvailableAdjusted = currentBlocksAvailable - ((daysPassed + 1) * BLOCKS_PER_DAY);
         double numberOfDaysUntilPayDay = getNumberOfDaysUntilPayDay(payDate);
-        long blocksToDisplay = Math.round(currentBlocksAvailableAdjusted / (numberOfDaysUntilPayDay - 1));
-        return blocksToDisplay;
+        double blocksToDisplay = currentBlocksAvailableAdjusted / (numberOfDaysUntilPayDay - 1);
+        return ((Double) Math.ceil(blocksToDisplay - 0.35)).intValue();
     }
 
     public static String getCurrencySymbol() {
@@ -93,13 +93,18 @@ public class Utils {
         int daysPassed = getDayNumber(setupDay);
         double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
         double currentBlocksAvailableAdjusted = currentBlocksAvailable - (BLOCKS_PER_DAY * daysPassed);
-        long todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
+        double tomorrowsBlocks = Math.ceil((currentBlocksAvailableAdjusted) / (daysDifference - (daysPassed + 1)));
         int underSpendValue = -1;
-        long tomorrowsBlocks = todaysBlocks;
-        while(todaysBlocks == tomorrowsBlocks) {
+        //double tomorrowsBlocksAdjusted = Math.ceil((currentBlocksAvailableAdjusted) / (daysDifference - (daysPassed + 1)));
+        while(true) {
             underSpendValue++;
-            tomorrowsBlocks = Math.round(currentBlocksAvailableAdjusted + underSpendValue) / (daysDifference - (daysPassed + 1));
-            if (underSpendValue > 9999) {
+            double calculatedAdjustment = (currentBlocksAvailableAdjusted + underSpendValue) / (daysDifference - (daysPassed + 1));
+
+            if(calculatedAdjustment - tomorrowsBlocks > 1.0) {
+                break;
+            }
+
+            if (underSpendValue > 98) {
                 break;
             }
         }
@@ -107,18 +112,26 @@ public class Utils {
     }
 
     public static int getOverSpendValue(long setupDay, long nextPayDate, double totalMoneyToSpend, double currentMoneyToSpend) {
+
         int daysDifference = getDaysDifference(setupDay, nextPayDate);
         double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
         double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
         double currentBlocksAvailableAdjusted = currentBlocksAvailable - (BLOCKS_PER_DAY * daysPassed);
-        long todaysBlocks = getTomorrowBlocksToDisplay(setupDay, nextPayDate, currentMoneyToSpend, staticBlockPrice);
+        double tomorrowsBlocks = Math.ceil((currentBlocksAvailableAdjusted) / (daysDifference - (daysPassed + 1)));
         int overSpendValue = -1;
-        long tomorrowsBlocks = todaysBlocks;
-        while(todaysBlocks == tomorrowsBlocks) {
+
+        //double tomorrowsBlocksAdjusted = Math.ceil((currentBlocksAvailableAdjusted) / (daysDifference - (daysPassed + 1)));
+        while(true) {
             overSpendValue++;
-            tomorrowsBlocks = Math.round(currentBlocksAvailableAdjusted - overSpendValue) / (daysDifference - (daysPassed + 1));
-            if (overSpendValue > 9999) {
+            double calculatedAdjustment = (currentBlocksAvailableAdjusted - overSpendValue) / (daysDifference - (daysPassed + 1));
+            //tomorrowsBlocksAdjusted = Math.ceil(calculatedAdjustment);
+
+            if(tomorrowsBlocks - calculatedAdjustment > 1.0) {
+                break;
+            }
+
+            if (overSpendValue > 98) {
                 break;
             }
         }

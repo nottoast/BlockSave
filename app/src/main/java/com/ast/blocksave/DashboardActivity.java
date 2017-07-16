@@ -156,9 +156,12 @@ public class DashboardActivity extends AppCompatActivity {
         blocksToSpendText = (TextView) findViewById(R.id.blocksToSpendText);
     }
 
-    private void displayBlocks(long numberOfBlocksToDisplay) {
+    private void displayBlocks(long numberOfBlocksToDisplay, long numberOfBlocksToHighlight) {
 
-        for (int i = 0; i < 14; i++) {
+        blockDisplayLayoutTop.removeAllViews();
+        blockDisplayLayoutBottom.removeAllViews();
+
+        for (int i = 0; i < numberOfBlocksToDisplay; i++) {
 
             TextView textView = null;
 
@@ -175,7 +178,13 @@ public class DashboardActivity extends AppCompatActivity {
             Drawable drawable = null;
             textView.setPadding(15, 15, 15, 15);
             textView.setTextSize(17);
-            drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block);
+
+            if(i >= numberOfBlocksToDisplay - numberOfBlocksToHighlight) {
+                drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_2);
+            } else {
+                drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_1);
+            }
+
             textView.setBackground(drawable);
 
             if ( (i % 2) == 0) {
@@ -185,10 +194,6 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
         }
-
-    }
-
-    private void highlightBlocksForRemoval(long numberOfBlocksToHighlight) {
 
     }
 
@@ -208,6 +213,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         long blocksToDisplay = Utils.getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, staticBlockPrice);
+        long blocksToShow = blocksToDisplay;
         if (blocksToDisplay < 0) {
             blocksToDisplay = blocksToDisplay * -1;
             blocksToSpendText.setText(TODAYS_BLOCKS_NEGATIVE);
@@ -260,8 +266,7 @@ public class DashboardActivity extends AppCompatActivity {
             switchToSettingsScreen();
         }
 
-        displayBlocks(blocksToDisplay);
-        highlightBlocksForRemoval(blocksToDeduct);
+        displayBlocks(blocksToShow, blocksToDeduct);
 
     }
 
