@@ -10,12 +10,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -37,7 +33,7 @@ public class HelpActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_help, menu);
         return true;
     }
 
@@ -45,10 +41,22 @@ public class HelpActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_dashboard) {
+
+            SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("help_visited", true);
+            editor.commit();
+
             Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_setup) {
+
+            SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("help_visited", true);
+            editor.commit();
+
             Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
             startActivity(intent);
             return true;
