@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_column="0"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:layout_row="0"
         android:text="When do you next get paid?"
         android:textSize="22sp"
@@ -23,22 +23,24 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="422dp"
+        android:layout_height="405dp"
         android:layout_column="0"
         android:layout_marginTop="16dp"
         android:layout_row="1"
         android:background="@drawable/border_style_1"
+        android:gravity="center_vertical|center"
         android:orientation="horizontal">
 
         <DatePicker
-            android:id="@+id/payDate"
+            android:id="@+id/datePicker"
             android:layout_width="wrap_content"
-            android:layout_height="400dp"
-            android:layout_marginLeft="16dp"
+            android:layout_height="450dp"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:scaleX="0.9"
-            android:scaleY="0.9" />
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:scaleX="0.85"
+            android:scaleY="0.85" />
     </LinearLayout>
 
     <LinearLayout

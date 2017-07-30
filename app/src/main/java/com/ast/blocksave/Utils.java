@@ -21,8 +21,8 @@ public class Utils {
         Date payDate = null;
         Date setupDate = null;
         try {
-            payDate = sdf.parse("31/07/2017");
-            setupDate = sdf.parse("02/07/2017");
+            payDate = sdf.parse("31/08/2017");
+            setupDate = sdf.parse("30/07/2017");
         } catch(Exception ex) {
         }
 
@@ -34,7 +34,7 @@ public class Utils {
         double staticBlockPrice = getStaticBlockPrice(totalMoney, daysDifference);
         System.out.println("Static block price: "+staticBlockPrice);
 
-        System.out.println(getBlocksToDisplay(currentMoney, setupDate.getTime(), payDate.getTime(), staticBlockPrice));
+        System.out.println(getBlocksToDisplay(currentMoney, setupDate.getTime(), payDate.getTime(), staticBlockPrice, BLOCKS_PER_DAY));
         System.out.println(getBlockBudgetFromTomorrow(setupDate.getTime(), payDate.getTime(), currentMoney, staticBlockPrice));
         System.out.println("------------------------------------------------------");
 
@@ -43,7 +43,7 @@ public class Utils {
         System.out.println(getUnderSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
         System.out.println(getOverSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
         System.out.println("------------------------------------------------------");
-        System.out.println("Get blocks to deduct: " + getBlocksToDeduct(totalMoney, currentMoney, 5.00, staticBlockPrice, setupDate.getTime(), payDate.getTime()));
+        System.out.println("Get blocks to deduct: " + getBlocksToDeduct(totalMoney, currentMoney, 5.00, staticBlockPrice, setupDate.getTime(), payDate.getTime(), BLOCKS_PER_DAY));
         System.out.println("------------------------------------------------------");
         System.out.println("Rounded date: " + roundDate(1501013510654L));
         System.out.println("Rounded date (formatted): " + new Date(roundDate(1501013510654L)));
@@ -101,11 +101,10 @@ public class Utils {
         return staticBlockPrice;
     }
 
-    public static long getBlocksToDisplay(double currentMoneyToSpend, long setupDay, long payDate, double staticBlockPrice) {
+    public static long getBlocksToDisplay(double currentMoneyToSpend, long setupDay, long payDate, double staticBlockPrice, long todaysBlocks) {
 
         double currentBlocksAvailableInteger = ((currentMoneyToSpend) / staticBlockPrice);
-        double blocksBudget = getBlockBudgetFromToday(setupDay, payDate, currentMoneyToSpend, staticBlockPrice);
-        double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * blocksBudget;
+        double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * todaysBlocks;
 
         return Math.round(currentBlocksAvailableInteger - blocksToDeduct);
     }
@@ -116,20 +115,13 @@ public class Utils {
         int daysPassed = getDayNumber(setupDay);
         double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
         double daysToDivide = (daysDifference - (daysPassed));
+
+        if(daysToDivide == 0) {
+            return 0;
+        }
+
         double tomorrowsBlocks = (currentBlocksAvailable) / daysToDivide;
         long tomorrowsBlocksRounded = ((Double)Math.floor(tomorrowsBlocks)).intValue();
-
-        return tomorrowsBlocksRounded;
-    }
-
-    public static long getBlockBudgetFromToday(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
-
-        int daysDifference = getDaysDifference(setupDay, payDate);
-        int daysPassed = getDayNumber(setupDay);
-        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
-        double daysToDivide = (daysDifference - (daysPassed-1));
-        double tomorrowsBlocks = (currentBlocksAvailable) / (daysToDivide);
-        long tomorrowsBlocksRounded = ((Double)Math.ceil(tomorrowsBlocks)).intValue();
 
         return tomorrowsBlocksRounded;
     }
@@ -184,13 +176,13 @@ public class Utils {
         return overSpendValue;
     }
 
-    public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate) {
+    public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate, long todaysBlocks) {
 
-        double currentDisplayedBlocks = Math.round((currentMoneyToSpend) / staticBlockPrice);
-        //double currentDisplayedBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, payDate, staticBlockPrice);
+        //double currentDisplayedBlocks = Math.round((currentMoneyToSpend) / staticBlockPrice);
+        double currentDisplayedBlocks = getBlocksToDisplay(currentMoneyToSpend, setupDay, payDate, staticBlockPrice, todaysBlocks);
 
-        double newDisplayBlocks = Math.round((currentMoneyToSpend - purchaseAmount) / staticBlockPrice);
-        //double newDisplayBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice);
+        //double newDisplayBlocks = Math.round((currentMoneyToSpend - purchaseAmount) / staticBlockPrice);
+        double newDisplayBlocks = getBlocksToDisplay(currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice, todaysBlocks);
 
         return Math.round(currentDisplayedBlocks - newDisplayBlocks);
     }
@@ -200,15 +192,23 @@ public class Utils {
         return Math.round((totalMoneyToSpend) / staticBlockPrice);
     }
 
-    public static java.util.Date getDateFromDatePicker(DatePicker datePicker){
+    public static java.util.Date getDateFromDatePicker(DatePicker datePicker) throws Exception {
 
         int day = datePicker.getDayOfMonth();
         int month = datePicker.getMonth();
-        int year =  datePicker.getYear();
+        int year = datePicker.getYear();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
 
         return calendar.getTime();
+    }
+
+    public static boolean isTheSameDay(long blockCountDay, long currentTime) {
+        if(roundDate(blockCountDay) == roundDate(currentTime)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

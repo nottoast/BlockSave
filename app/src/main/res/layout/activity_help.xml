@@ -23,7 +23,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="325dp"
+        android:layout_height="320dp"
         android:layout_column="0"
         android:layout_marginTop="16dp"
         android:layout_row="1"
@@ -31,7 +31,7 @@
         android:orientation="vertical"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="16dp">
+        android:paddingTop="12dp">
 
         <TextView
             android:id="@+id/textView11"
@@ -45,16 +45,17 @@
             android:id="@+id/textView12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="1.88"
-            android:text="BlockSave will split your daily allowance into 10 blocks, which you are then free to spend as you wish. If you go over your allowance it will affect the budget for future days, likewise if you go under. "
+            android:text="We then split your daily allowance into 10 blocks, which you are free to spend as you wish. If you go over your allowance it will affect the budget for future days, likewise it will reduce if you under spend. "
             android:textSize="17sp" />
 
         <TextView
             android:id="@+id/textView14"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="2dp"
             android:layout_weight="5.29"
             android:text="Simply continue and fill out the details to get started!"
             android:textSize="17sp" />

@@ -1,5 +1,7 @@
 package com.ast.blocksave;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +17,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,10 +27,10 @@ public class SetupActivity extends AppCompatActivity {
     private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol() + " ";
 
     private float totalMoneyToSpend = 0.0F;
-    private long nextPayDay = Calendar.getInstance().getTimeInMillis();
+    private long payDate = Calendar.getInstance().getTimeInMillis();
     private long setupDate = Calendar.getInstance().getTimeInMillis();
 
-    private DatePicker payDate;
+    private DatePicker datePicker;
     private EditText budget;
     private TextView blockValueText;
     private TextView currency1;
@@ -97,19 +98,19 @@ public class SetupActivity extends AppCompatActivity {
 
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     Date date = null;
                     try {
-                        date = sdf.parse(Utils.getDateFromDatePicker(payDate).toString());
-                    } catch (ParseException e) {
+                        date = Utils.getDateFromDatePicker(datePicker);
+                    } catch (Exception e) {
                     }
                     if (date != null) {
-                        nextPayDay = date.getTime();
+                        payDate = date.getTime();
                     }
 
                     setContentView(R.layout.activity_setup_total);
                     findTotalSetupScreenElements();
                     addTotalSetupListeners();
+                    calculateAndDisplayData();
 
                 }
 
@@ -130,12 +131,37 @@ public class SetupActivity extends AppCompatActivity {
                     } catch (Exception ex) {
                     }
 
-                    saveData();
-                    calculateAndDisplayData();
+                    SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy/MM/dd");
 
-                    Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
-                    startActivity(intent);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SetupActivity.this);
+                    try {
+                        builder.setMessage("Are you sure you want to manage spending of "+Utils.getCurrencySymbol() + totalMoneyToSpend + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?");
+
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                dialog.dismiss();
+
+                                saveData();
+
+                                Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
+                                startActivity(intent);
+
+                            }
+                        });
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+                    } catch (Exception e) {
+                    }
+
                 }
+
                 return false;
             }
         });
@@ -151,7 +177,7 @@ public class SetupActivity extends AppCompatActivity {
             }
         });
 
-        payDate.setOnKeyListener(new View.OnKeyListener() {
+        datePicker.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View view, int keyCode, KeyEvent event) {
                 try {
                     totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
@@ -165,10 +191,18 @@ public class SetupActivity extends AppCompatActivity {
 
     private void findDateSetupScreenElements() {
 
-        payDate = (DatePicker) findViewById(R.id.payDate);
-        payDate.updateDate(Integer.valueOf(new SimpleDateFormat("yyyy").format(new Date(nextPayDay))),
-                Integer.valueOf(new SimpleDateFormat("MM").format(new Date(nextPayDay))),
-                Integer.valueOf(new SimpleDateFormat("dd").format(new Date(nextPayDay))));
+        datePicker = (DatePicker) findViewById(R.id.datePicker);
+        datePicker.setMinDate(Calendar.getInstance().getTimeInMillis() - 1000);
+
+        if(payDate == 0L) {
+            datePicker.updateDate(Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH),
+                    Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH));
+        } else {
+            datePicker.updateDate(Integer.valueOf(new SimpleDateFormat("yyyy").format(new Date(payDate))),
+                    Integer.valueOf(new SimpleDateFormat("MM").format(new Date(payDate)))-1,
+                    Integer.valueOf(new SimpleDateFormat("dd").format(new Date(payDate))));
+        }
 
         continueButton = (Button) findViewById(R.id.continueButton);
     }
@@ -187,7 +221,7 @@ public class SetupActivity extends AppCompatActivity {
     private void loadData() {
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
         totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
-        nextPayDay = preferences.getLong("next_pay_day", 0L);
+        payDate = preferences.getLong("next_pay_day", 0L);
         setupDate = preferences.getLong("setup_day", 0L);
     }
 
@@ -197,18 +231,20 @@ public class SetupActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putFloat("total_money_to_spend", totalMoneyToSpend);
         editor.putFloat("current_money_to_spend", totalMoneyToSpend);
-        editor.putLong("next_pay_day", nextPayDay);
+        editor.putLong("next_pay_day", payDate);
         editor.putLong("setup_day", setupDate);
         editor.putBoolean("help_visited", true);
+        editor.putLong("block_count", BLOCKS_PER_DAY);
+        editor.putLong("block_count_day", setupDate);
         editor.commit();
     }
 
     private void calculateAndDisplayData() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            nextPayDay = sdf.parse(Utils.getDateFromDatePicker(payDate).toString()).getTime();
+            payDate = Utils.getDateFromDatePicker(datePicker).getTime();
             DecimalFormat formatter = new DecimalFormat("##.00");
-            int daysDifference = Utils.getDaysDifference(setupDate, nextPayDay);
+            int daysDifference = Utils.getDaysDifference(setupDate, payDate);
             String staticBlockPrice = formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
             if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
                 staticBlockPrice = "0.00";

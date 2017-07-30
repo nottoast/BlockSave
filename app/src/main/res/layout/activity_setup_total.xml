@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_column="0"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:layout_row="0"
         android:text="How much money can you spend until your next pay day?"
         android:textSize="22sp"
@@ -23,7 +23,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
         android:layout_column="0"
         android:layout_marginTop="16dp"
         android:layout_row="1"
@@ -54,7 +54,7 @@
 
         <EditText
             android:id="@+id/budget"
-            android:layout_width="150dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.00"
             android:ems="10"
@@ -66,7 +66,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="70dp"
         android:layout_column="0"
         android:layout_marginTop="12dp"
         android:layout_row="2"
@@ -80,9 +80,11 @@
 
         <TextView
             android:id="@+id/blockValueText"
-            android:layout_width="50dp"
+            android:layout_width="210dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.68"
+            android:layout_marginRight="16dp"
+            android:layout_weight="0.48"
+            android:gravity="right"
             android:text="A block is worth  $ 0.00"
             android:textSize="22sp"
             android:textStyle="italic" />
