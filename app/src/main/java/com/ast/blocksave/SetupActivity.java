@@ -37,15 +37,15 @@ public class SetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup);
+        setContentView(R.layout.activity_setup_total);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setContentView(R.layout.activity_setup);
+        setContentView(R.layout.activity_setup_total);
         loadData();
-        findSetupScreenElements();
+        findDateSetupScreenElements();
         calculateAndDisplayData();
         addListeners();
     }
@@ -131,8 +131,19 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
-    private void findSetupScreenElements() {
+    private void findDateSetupScreenElements() {
         payDay = (EditText) findViewById(R.id.payDay);
+        payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
+        budget = (EditText) findViewById(R.id.budget);
+        budget.setText("" + totalMoneyToSpend);
+        saveButton = (Button) findViewById(R.id.saveButton);
+        blockValueText = (TextView) findViewById(R.id.blockValueText);
+        currency1 = (TextView) findViewById(R.id.currency1);
+        currency1.setText(Utils.getCurrencySymbol());
+    }
+
+    private void findTotalSetupScreenElements() {
+        //payDay = (EditText) findViewById(R.id.payDay);
         payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
         budget = (EditText) findViewById(R.id.budget);
         budget.setText("" + totalMoneyToSpend);

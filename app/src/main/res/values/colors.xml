@@ -7,5 +7,5 @@
     <color name="block_colour">#FFC107</color>
     <color name="block_colour_2">#e1a61c</color>
     <color name="background_colour_1">#FFFFFF</color>
-    <color name="background_colour_2">#64B5F6</color>
+    <color name="background_colour_2">#f5f5f5</color>
 </resources>
