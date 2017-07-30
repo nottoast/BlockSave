@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -28,26 +29,29 @@ public class SetupActivity extends AppCompatActivity {
     private long nextPayDay = Calendar.getInstance().getTimeInMillis();
     private long setupDate = Calendar.getInstance().getTimeInMillis();
 
-    private EditText payDay;
+    private DatePicker payDate;
     private EditText budget;
     private TextView blockValueText;
     private TextView currency1;
     private Button saveButton;
+    private Button continueButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup_total);
+        setContentView(R.layout.activity_setup_date);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setContentView(R.layout.activity_setup_total);
+        setContentView(R.layout.activity_setup_date);
         loadData();
+
         findDateSetupScreenElements();
+        addDateSetupListeners();
+
         calculateAndDisplayData();
-        addListeners();
     }
 
     @Override
@@ -60,8 +64,10 @@ public class SetupActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_dashboard) {
+
             Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
             startActivity(intent);
+
             return true;
         } else if (id == R.id.action_help) {
 
@@ -72,32 +78,58 @@ public class SetupActivity extends AppCompatActivity {
 
             Intent intent = new Intent(getApplicationContext(), HelpActivity.class);
             startActivity(intent);
+
             return true;
         } else if (id == R.id.action_exit) {
+
             this.finishAffinity();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void addListeners() {
-        saveButton.setOnTouchListener(new View.OnTouchListener() {
+    private void addDateSetupListeners() {
+
+        continueButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     Date date = null;
                     try {
-                        date = sdf.parse(payDay.getText().toString());
+                        date = sdf.parse(Utils.getDateFromDatePicker(payDate).toString());
                     } catch (ParseException e) {
                     }
                     if (date != null) {
                         nextPayDay = date.getTime();
                     }
+
+                    setContentView(R.layout.activity_setup_total);
+                    findTotalSetupScreenElements();
+                    addTotalSetupListeners();
+
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void addTotalSetupListeners() {
+
+        saveButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
                     try {
                         totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
                     } catch (Exception ex) {
                     }
+
                     saveData();
                     calculateAndDisplayData();
 
@@ -119,7 +151,7 @@ public class SetupActivity extends AppCompatActivity {
             }
         });
 
-        payDay.setOnKeyListener(new View.OnKeyListener() {
+        payDate.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View view, int keyCode, KeyEvent event) {
                 try {
                     totalMoneyToSpend = Float.parseFloat(budget.getText().toString());
@@ -132,25 +164,24 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void findDateSetupScreenElements() {
-        payDay = (EditText) findViewById(R.id.payDay);
-        payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
-        budget = (EditText) findViewById(R.id.budget);
-        budget.setText("" + totalMoneyToSpend);
-        saveButton = (Button) findViewById(R.id.saveButton);
-        blockValueText = (TextView) findViewById(R.id.blockValueText);
-        currency1 = (TextView) findViewById(R.id.currency1);
-        currency1.setText(Utils.getCurrencySymbol());
+
+        payDate = (DatePicker) findViewById(R.id.payDate);
+        payDate.updateDate(Integer.valueOf(new SimpleDateFormat("yyyy").format(new Date(nextPayDay))),
+                Integer.valueOf(new SimpleDateFormat("MM").format(new Date(nextPayDay))),
+                Integer.valueOf(new SimpleDateFormat("dd").format(new Date(nextPayDay))));
+
+        continueButton = (Button) findViewById(R.id.continueButton);
     }
 
     private void findTotalSetupScreenElements() {
-        //payDay = (EditText) findViewById(R.id.payDay);
-        payDay.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(nextPayDay)));
+
         budget = (EditText) findViewById(R.id.budget);
         budget.setText("" + totalMoneyToSpend);
         saveButton = (Button) findViewById(R.id.saveButton);
         blockValueText = (TextView) findViewById(R.id.blockValueText);
         currency1 = (TextView) findViewById(R.id.currency1);
         currency1.setText(Utils.getCurrencySymbol());
+
     }
 
     private void loadData() {
@@ -175,7 +206,7 @@ public class SetupActivity extends AppCompatActivity {
     private void calculateAndDisplayData() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            nextPayDay = sdf.parse(payDay.getText().toString()).getTime();
+            nextPayDay = sdf.parse(Utils.getDateFromDatePicker(payDate).toString()).getTime();
             DecimalFormat formatter = new DecimalFormat("##.00");
             int daysDifference = Utils.getDaysDifference(setupDate, nextPayDay);
             String staticBlockPrice = formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));

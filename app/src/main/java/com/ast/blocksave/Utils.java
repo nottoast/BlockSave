@@ -1,5 +1,7 @@
 package com.ast.blocksave;
 
+import android.widget.DatePicker;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Currency;
@@ -13,7 +15,7 @@ public class Utils {
     public static void main(String[] args) {
 
         Float totalMoney = 300.0F;
-        Float currentMoney = 5.0F;
+        Float currentMoney = 290.0F;
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date payDate = null;
@@ -184,10 +186,10 @@ public class Utils {
 
     public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate) {
 
-        double currentDisplayedBlocks = (currentMoneyToSpend) / staticBlockPrice;
+        double currentDisplayedBlocks = Math.round((currentMoneyToSpend) / staticBlockPrice);
         //double currentDisplayedBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend, setupDay, payDate, staticBlockPrice);
 
-        double newDisplayBlocks = (currentMoneyToSpend - purchaseAmount) / staticBlockPrice;
+        double newDisplayBlocks = Math.round((currentMoneyToSpend - purchaseAmount) / staticBlockPrice);
         //double newDisplayBlocks = getBlocksToDisplay(totalMoneyToSpend, currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice);
 
         return Math.round(currentDisplayedBlocks - newDisplayBlocks);
@@ -196,5 +198,17 @@ public class Utils {
     public static long getTotalBlocksAvailable(float totalMoneyToSpend, Double staticBlockPrice) {
 
         return Math.round((totalMoneyToSpend) / staticBlockPrice);
+    }
+
+    public static java.util.Date getDateFromDatePicker(DatePicker datePicker){
+
+        int day = datePicker.getDayOfMonth();
+        int month = datePicker.getMonth();
+        int year =  datePicker.getYear();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+
+        return calendar.getTime();
     }
 }

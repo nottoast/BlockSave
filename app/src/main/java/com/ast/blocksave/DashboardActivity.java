@@ -196,7 +196,7 @@ public class DashboardActivity extends AppCompatActivity {
         blockDisplayLayoutTop.removeAllViews();
         blockDisplayLayoutBottom.removeAllViews();
 
-        int maxCountToDisplay = 16;
+        int maxCountToDisplay = 14;
 
         if(numberOfBlocksToDisplay > maxCountToDisplay-1) {
             numberOfBlocksToDisplay = maxCountToDisplay;
