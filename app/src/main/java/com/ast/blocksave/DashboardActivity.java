@@ -275,6 +275,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             textView.setText("  x  ");
             textView.setGravity(Gravity.CENTER_VERTICAL);
+            //textView.setElevation(10);
 
             if(i >= numberOfBlocksToDisplay - numberOfBlocksToHighlight) {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_2);

@@ -82,7 +82,7 @@
                 android:layout_column="0"
                 android:layout_marginLeft="0dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:layout_row="1"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
@@ -170,7 +170,7 @@
                     android:id="@+id/infoText3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="36dp"
+                    android:layout_marginLeft="24dp"
                     android:paddingRight="8dp"
                     android:text="Block value:"
                     android:textSize="17sp"
