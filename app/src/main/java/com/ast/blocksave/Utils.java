@@ -211,4 +211,33 @@ public class Utils {
             return false;
         }
     }
+
+    public static String formatMonetaryValue(String value) {
+
+        if(!value.isEmpty()) {
+            try {
+                if (value.contains(".")) {
+                    String[] valueSplit = value.split("\\.");
+                    if (valueSplit[valueSplit.length - 1].length() == 1) {
+                        value = value + "0";
+                    }
+                } else if (value.contains(",")) {
+                    String[] valueSplit = value.split(",");
+                    if (valueSplit[valueSplit.length - 1].length() == 1) {
+                        value = value + "0";
+                    }
+                }
+            } catch(Exception ex) {
+            }
+        }
+
+        return value;
+    }
+
+    public static String formatMonetaryValue(float floatValue) {
+
+        String value = floatValue+"";
+
+        return formatMonetaryValue(value);
+    }
 }

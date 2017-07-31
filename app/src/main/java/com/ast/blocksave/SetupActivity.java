@@ -27,6 +27,8 @@ public class SetupActivity extends AppCompatActivity {
     private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol() + " ";
 
     private float totalMoneyToSpend = 0.0F;
+    private float currentMoneyToSpend = 0.0F;
+
     private long payDate = Calendar.getInstance().getTimeInMillis();
     private long setupDate = Calendar.getInstance().getTimeInMillis();
 
@@ -131,11 +133,9 @@ public class SetupActivity extends AppCompatActivity {
                     } catch (Exception ex) {
                     }
 
-                    SimpleDateFormat simpleDateFormatter = new SimpleDateFormat("yyyy/MM/dd");
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(SetupActivity.this);
                     try {
-                        builder.setMessage("Are you sure you want to manage spending of "+Utils.getCurrencySymbol() + totalMoneyToSpend + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?");
+                        builder.setMessage("Manage spending of "+Utils.getCurrencySymbol() + Utils.formatMonetaryValue(totalMoneyToSpend) + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -210,17 +210,17 @@ public class SetupActivity extends AppCompatActivity {
     private void findTotalSetupScreenElements() {
 
         budget = (EditText) findViewById(R.id.budget);
-        budget.setText("" + totalMoneyToSpend);
+        budget.setText(Utils.formatMonetaryValue(currentMoneyToSpend));
         saveButton = (Button) findViewById(R.id.saveButton);
         blockValueText = (TextView) findViewById(R.id.blockValueText);
         currency1 = (TextView) findViewById(R.id.currency1);
         currency1.setText(Utils.getCurrencySymbol());
-
     }
 
     private void loadData() {
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
         totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
+        currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         payDate = preferences.getLong("next_pay_day", 0L);
         setupDate = preferences.getLong("setup_day", 0L);
     }

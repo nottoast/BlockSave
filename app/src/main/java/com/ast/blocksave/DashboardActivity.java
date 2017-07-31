@@ -31,6 +31,7 @@ public class DashboardActivity extends AppCompatActivity {
     private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() + " ";
     private String TODAYS_BLOCKS_POSITIVE = "Blocks left to spend today:";
     private String TODAYS_BLOCKS_NEGATIVE = "Blocks you have over spent:";
+    private long BLOCK_DISPLAY_LIMIT = 14;
 
     private float totalMoneyToSpend = 0.0F;
     private float currentMoneyToSpend = 0.0F;
@@ -68,9 +69,6 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
         boolean continueToLoadActivity = loadData();
         if(continueToLoadActivity) {
-            if (Utils.getDaysDifference(setupDay, nextPayDay) < 1 || totalMoneyToSpend == 0.0) {
-                //switchToSettingsScreen();
-            }
             findDashboardScreenElements();
             calculateAndDisplayData();
             addListeners();
@@ -132,15 +130,15 @@ public class DashboardActivity extends AppCompatActivity {
 
                         String blocksToDeductString = calculatedBlocks.getText().toString();
                         if(!blocksToDeductString.equals("1")) {
-                            blocksToDeductString = calculatedBlocks.getText().toString() + " blocks)?";
+                            blocksToDeductString = calculatedBlocks.getText().toString() + " blocks.";
                         } else {
-                            blocksToDeductString = calculatedBlocks.getText().toString() + " block)?";
+                            blocksToDeductString = calculatedBlocks.getText().toString() + " block.";
                         }
 
-                        builder.setMessage("Are you sure you want to add a purchase of "
+                        builder.setMessage("Add purchase of "
                                 + Utils.getCurrencySymbol()
-                                + purchaseAmount.getText().toString()
-                                + " ("
+                                + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + "?"
+                                + " This is worth "
                                 + blocksToDeductString);
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -249,10 +247,10 @@ public class DashboardActivity extends AppCompatActivity {
         blockDisplayLayoutTop.removeAllViews();
         blockDisplayLayoutBottom.removeAllViews();
 
-        int maxCountToDisplay = 14; //14
+        long spareBlocks = numberOfBlocksToDisplay - BLOCK_DISPLAY_LIMIT;
 
-        if(numberOfBlocksToDisplay > maxCountToDisplay-1) {
-            numberOfBlocksToDisplay = maxCountToDisplay;
+        if(numberOfBlocksToDisplay > BLOCK_DISPLAY_LIMIT-1) {
+            numberOfBlocksToDisplay = BLOCK_DISPLAY_LIMIT;
         }
 
         for (int i = 0; i < numberOfBlocksToDisplay; i++) {
@@ -281,11 +279,16 @@ public class DashboardActivity extends AppCompatActivity {
             if(i >= numberOfBlocksToDisplay - numberOfBlocksToHighlight) {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_2);
                 textView.setTextColor(Color.BLACK);
+
+                if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
+                    textView.setTextColor(Color.BLACK);
+                    textView.setText("  1  ");
+                }
             } else {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_1);
                 textView.setTextColor(ContextCompat.getColor(this, R.color.block_colour));
 
-                if(i == maxCountToDisplay-1 && numberOfBlocksToDisplay == maxCountToDisplay) {
+                if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
                     textView.setTextColor(Color.BLACK);
                     textView.setText("  2  ");
                 }
@@ -336,6 +339,7 @@ public class DashboardActivity extends AppCompatActivity {
             calculatedBlocks.setText("0");
         }
 
+        String blocksToDisplayString = "";
         long blocksToDisplay = Utils.getBlocksToDisplay(currentMoneyToSpend, setupDay, nextPayDay, staticBlockPrice, blockCount);
         long blocksToShow = blocksToDisplay;
         if (blocksToDisplay < 0) {
@@ -346,7 +350,12 @@ public class DashboardActivity extends AppCompatActivity {
         } else if (blocksToDisplay > 0) {
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
-            blocksToSpendToday.setText(blocksToDisplay + "");
+            if(blocksToDisplay > BLOCK_DISPLAY_LIMIT * 2) {
+                blocksToDisplayString = (BLOCK_DISPLAY_LIMIT * 2) + "+";
+            } else {
+                blocksToDisplayString = blocksToDisplay+"";
+            }
+            blocksToSpendToday.setText(blocksToDisplayString);
         } else {
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));

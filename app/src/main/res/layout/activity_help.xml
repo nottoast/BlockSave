@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_colour_2">
+
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_colour_2"
@@ -23,7 +28,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="280dp"
         android:layout_column="0"
         android:layout_marginTop="16dp"
         android:layout_row="1"
@@ -31,33 +36,33 @@
         android:orientation="vertical"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="12dp">
+        android:paddingTop="16dp">
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/helpText1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.71"
-            android:text="BlockSave is a simple way for you to save money. It simply takes two pieces of information from you, how much money you have to spend, and how long you need to make it last. "
+            android:text="BlockSave is a simple app to help you to save money. Simply provide two pieces of information, when you next get paid, and how much you have to spend until then."
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/helpText2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_weight="1.88"
-            android:text="We then split your daily allowance into 10 blocks, which you are free to spend as you wish. If you go over your allowance it will affect the budget for future days, likewise it will reduce if you under spend. "
+            android:text="We split your daily allowance into 10 blocks, which you are free to spend as you wish. Your daily budget can rise or fall depending on how much you spend each day."
             android:textSize="17sp" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/helpText3"
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:layout_marginBottom="12dp"
             android:layout_marginTop="2dp"
             android:layout_weight="5.29"
-            android:text="Simply continue and fill out the details to get started!"
+            android:text="Simply press continue and fill out the details to get started."
             android:textSize="17sp" />
     </LinearLayout>
 
@@ -82,3 +87,5 @@
     </LinearLayout>
 
 </GridLayout>
+
+</ScrollView>
