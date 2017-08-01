@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -28,10 +30,13 @@ import static com.ast.blocksave.SetupActivity.BLOCKS_PER_DAY;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() + " ";
+    private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() ;
     private String TODAYS_BLOCKS_POSITIVE = "Blocks left to spend today:";
     private String TODAYS_BLOCKS_NEGATIVE = "Blocks you have over spent:";
     private long BLOCK_DISPLAY_LIMIT = 14;
+    private int ELEVATION_HEIGHT = 6;
+    private String OVER_SPEND_ZERO_TEXT = "Tomorrows budget is";
+    private String OVER_SPEND_BLOCK_ZERO_TEXT = "  0 blocks";
 
     private float totalMoneyToSpend = 0.0F;
     private float currentMoneyToSpend = 0.0F;
@@ -44,12 +49,24 @@ public class DashboardActivity extends AppCompatActivity {
 
     private LinearLayout blockDisplayLayoutTop;
     private LinearLayout blockDisplayLayoutBottom;
-    private GridLayout tomorrowLayout;
+
+    private LinearLayout overSpendLayout;
+    private LinearLayout blocksOverLayout;
+
+    private TextView overSpendTitleText1;
+    private TextView overSpendTitleText2;
+
     private GridLayout topLevelGridLayout;
+    private GridLayout dayCountLayout;
+    private GridLayout blocksToSpendLayout;
+    private GridLayout purchaseEntryLayout;
+    private GridLayout tomorrowInfoLayout;
+
     private TextView blocksToSpendToday;
     private TextView purchaseAmount;
     private TextView calculatedBlocks;
     private Button purchaseButton;
+
     private TextView underSpendOutput;
     private TextView overSpendOutput;
     private TextView tomorrowsBudgetOutput;
@@ -130,16 +147,16 @@ public class DashboardActivity extends AppCompatActivity {
 
                         String blocksToDeductString = calculatedBlocks.getText().toString();
                         if(!blocksToDeductString.equals("1")) {
-                            blocksToDeductString = calculatedBlocks.getText().toString() + " blocks.";
+                            blocksToDeductString = calculatedBlocks.getText().toString() + " blocks";
                         } else {
-                            blocksToDeductString = calculatedBlocks.getText().toString() + " block.";
+                            blocksToDeductString = calculatedBlocks.getText().toString() + " block";
                         }
 
                         builder.setMessage("Add purchase of "
                                 + Utils.getCurrencySymbol()
                                 + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + "?"
-                                + " This is worth "
-                                + blocksToDeductString);
+                                + "\n\nThis will cost "
+                                + blocksToDeductString + ".");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -225,10 +242,26 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void findDashboardScreenElements() {
+
         topLevelGridLayout = (GridLayout) findViewById(R.id.topLevelGridLayout);
+
+        dayCountLayout = (GridLayout) findViewById(R.id.dayCountLayout);
+        dayCountLayout.setElevation(ELEVATION_HEIGHT);
+        blocksToSpendLayout = (GridLayout) findViewById(R.id.blocksToSpendLayout);
+        blocksToSpendLayout.setElevation(ELEVATION_HEIGHT);
+        purchaseEntryLayout = (GridLayout) findViewById(R.id.purchaseEntryLayout);
+        purchaseEntryLayout.setElevation(ELEVATION_HEIGHT);
+        tomorrowInfoLayout = (GridLayout) findViewById(R.id.tomorrowInfoLayout);
+        tomorrowInfoLayout.setElevation(ELEVATION_HEIGHT);
+
+        blocksOverLayout = (LinearLayout) findViewById(R.id.blocksOverLayout);
+        overSpendLayout = (LinearLayout) findViewById(R.id.overSpendLayout);
+        overSpendTitleText1 = (TextView) findViewById(R.id.overSpendTitleText1);
+        overSpendTitleText2 = (TextView) findViewById(R.id.overSpendTitleText2);
+
         blockDisplayLayoutTop = (LinearLayout) findViewById(R.id.blockDisplayLayoutTop);
         blockDisplayLayoutBottom = (LinearLayout) findViewById(R.id.blockDisplayLayoutBottom);
-        tomorrowLayout = (GridLayout) findViewById(R.id.tomorrowLayout);
+        tomorrowInfoLayout = (GridLayout) findViewById(R.id.tomorrowInfoLayout);
         blocksToSpendToday = (TextView) findViewById(R.id.blocksToSpendToday);
         purchaseAmount = (TextView) findViewById(R.id.purchaseAmount);
         purchaseButton = (Button) findViewById(R.id.purchaseButton);
@@ -261,21 +294,32 @@ public class DashboardActivity extends AppCompatActivity {
 
             if ( (i % 2) == 0) {
                 textView = new TextView(blockDisplayLayoutTop.getContext());
-                textView.setPadding(13, 16, 13, 26);
-                params.setMargins(25, 25, 0, 0);
+                textView.setPadding(Utils.convertDpToPixels(2.5F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(7F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(2.5F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(8F, this.getApplicationContext()));
+                params.setMargins(Utils.convertDpToPixels(8F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(6F, this.getApplicationContext()), 0, 0);
             } else {
                 textView = new TextView(blockDisplayLayoutBottom.getContext());
-                textView.setPadding(13, 16, 13, 26);
-                params.setMargins(25, 5, 0, 0);
+                textView.setPadding(Utils.convertDpToPixels(2.5F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(7F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(2.5F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(8F, this.getApplicationContext()));
+                params.setMargins(Utils.convertDpToPixels(8F, this.getApplicationContext()),
+                        Utils.convertDpToPixels(2F, this.getApplicationContext()), 0, 0);
             }
+
+            Typeface typeface = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+            textView.setTypeface(typeface);
 
             Drawable drawable = null;
 
             textView.setTextSize(17);
 
-            textView.setText("  x  ");
+            textView.setText(" x ");
             textView.setGravity(Gravity.CENTER_VERTICAL);
-            //textView.setElevation(10);
+            textView.setElevation(ELEVATION_HEIGHT);
 
             if(i >= numberOfBlocksToDisplay - numberOfBlocksToHighlight) {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_2);
@@ -283,7 +327,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
                     textView.setTextColor(Color.BLACK);
-                    textView.setText("  1  ");
+                    //textView.setText("  1  ");
                 }
             } else {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_1);
@@ -291,7 +335,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
                     textView.setTextColor(Color.BLACK);
-                    textView.setText("  2  ");
+                    textView.setText(" 2 ");
                 }
             }
 
@@ -316,7 +360,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         double unformattedStaticBlockPrice = Utils.getStaticBlockPrice(totalMoneyToSpend, numberOfDaysUntilPayDay);
 
-        DecimalFormat formatter = new DecimalFormat("##.00");
+        DecimalFormat formatter = new DecimalFormat("#.00");
         double staticBlockPrice = Double.valueOf(formatter.format(unformattedStaticBlockPrice));
 
         loadTodaysBlocksData();
@@ -343,12 +387,16 @@ public class DashboardActivity extends AppCompatActivity {
         String blocksToDisplayString = "";
         long blocksToDisplay = Utils.getBlocksToDisplay(currentMoneyToSpend, setupDay, nextPayDay, staticBlockPrice, blockCount);
         long blocksToShow = blocksToDisplay;
+
         if (blocksToDisplay < 0) {
+
             blocksToDisplay = blocksToDisplay * -1;
             blocksToSpendText.setText(TODAYS_BLOCKS_NEGATIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
             blocksToSpendToday.setText(blocksToDisplay + "");
+
         } else if (blocksToDisplay > 0) {
+
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark));
             if(blocksToDisplay > BLOCK_DISPLAY_LIMIT * 2) {
@@ -357,15 +405,18 @@ public class DashboardActivity extends AppCompatActivity {
                 blocksToDisplayString = blocksToDisplay+"";
             }
             blocksToSpendToday.setText(blocksToDisplayString);
+
         } else {
+
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
             blocksToSpendToday.setText("None");
+
         }
 
         if(numberOfDaysUntilPayDay < 2) {
 
-            topLevelGridLayout.removeView(tomorrowLayout);
+            topLevelGridLayout.removeView(tomorrowInfoLayout);
 
         } else {
 
@@ -396,16 +447,37 @@ public class DashboardActivity extends AppCompatActivity {
             }
 
             long tomorrowsBudget = Utils.getBlockBudgetFromTomorrow(setupDay, nextPayDay, currentMoneyToSpend, staticBlockPrice);
-            if (tomorrowsBudget < 10) {
-                if (tomorrowsBudget == 1) {
-                    tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " block");
-                } else {
-                    tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " blocks");
-                }
-            } else if (tomorrowsBudget > 99) {
-                tomorrowsBudgetOutput.setText("99+ blocks");
+
+            if(tomorrowsBudget < 1) {
+
+                tomorrowInfoLayout.removeView(blocksOverLayout);
+
+                tomorrowInfoLayout.removeView(overSpendLayout);
+
+                ViewGroup.LayoutParams layoutParams = tomorrowInfoLayout.getLayoutParams();
+                layoutParams.height = Utils.convertDpToPixels(132.0F, this.getApplicationContext());
+                tomorrowInfoLayout.setLayoutParams(layoutParams);
+
+                overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
+
+                overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
+
+                overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
+
             } else {
-                tomorrowsBudgetOutput.setText(" " + tomorrowsBudget + " blocks");
+
+                if (tomorrowsBudget < 10) {
+                    if (tomorrowsBudget == 1) {
+                        tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " block");
+                    } else {
+                        tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " blocks");
+                    }
+                } else if (tomorrowsBudget > 99) {
+                    tomorrowsBudgetOutput.setText("99+ blocks");
+                } else {
+                    tomorrowsBudgetOutput.setText(" " + tomorrowsBudget + " blocks");
+                }
+
             }
 
         }

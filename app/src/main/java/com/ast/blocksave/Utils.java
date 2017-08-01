@@ -1,7 +1,12 @@
 package com.ast.blocksave;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
 import android.widget.DatePicker;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Currency;
@@ -137,7 +142,7 @@ public class Utils {
         double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
         double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
-        double tomorrowsBlocks = getBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice);
+        double tomorrowsBlocks = getBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice)+0.01;
 
         int underSpendValue = -1;
         while(true) {
@@ -236,8 +241,28 @@ public class Utils {
 
     public static String formatMonetaryValue(float floatValue) {
 
-        String value = floatValue+"";
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        String value = formatter.format(floatValue);
 
         return formatMonetaryValue(value);
     }
+
+    public static String formatMonetaryValue(double doubleValue) {
+
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        String value = formatter.format(doubleValue);
+
+        return formatMonetaryValue(value);
+    }
+
+    public static int convertDpToPixels(float dp, Context context){
+        Resources resources = context.getResources();
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                resources.getDisplayMetrics()
+        );
+    }
+
+
 }

@@ -25,5 +25,6 @@
             android:name=".HelpActivity"
             android:launchMode="singleTask">
         </activity>
+        <receiver android:name=".NotificationPublisher" />
     </application>
 </manifest>

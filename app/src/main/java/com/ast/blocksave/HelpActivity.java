@@ -42,20 +42,14 @@ public class HelpActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_dashboard) {
 
-            SharedPreferences settings = getSharedPreferences("block_save_data", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("help_visited", true);
-            editor.commit();
+            saveData();
 
             Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_setup) {
 
-            SharedPreferences settings = getSharedPreferences("block_save_data", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("help_visited", true);
-            editor.commit();
+            saveData();
 
             Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
             startActivity(intent);
@@ -65,6 +59,20 @@ public class HelpActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        saveData();
+        Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
+        startActivity(intent);
+    }
+
+    private void saveData() {
+        SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("help_visited", true);
+        editor.commit();
     }
 
     private void addListeners() {

@@ -27,6 +27,7 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:id="@+id/helpTextLayout"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_column="0"
@@ -43,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.71"
-            android:text="BlockSave is a simple app to help you to save money. Simply provide two pieces of information, when you next get paid, and how much you have to spend until then."
+            android:text="BlockSave is a simple app to help you to save money. All you need to do is enter when you next get paid, and how much you have to spend until then."
             android:textSize="17sp" />
 
         <TextView
@@ -52,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_weight="1.88"
-            android:text="We split your daily allowance into 10 blocks, which you are free to spend as you wish. Your daily budget can rise or fall depending on how much you spend each day."
+            android:text="We split your daily allowance into 10 blocks, which you are free to spend as you wish. Your daily block budget can rise or fall depending on how much you spend each day."
             android:textSize="17sp" />
 
         <TextView
@@ -67,6 +68,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/helpTextButtonLayout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_column="0"

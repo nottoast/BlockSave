@@ -1,9 +1,14 @@
 package com.ast.blocksave;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -24,7 +29,7 @@ import java.util.Date;
 public class SetupActivity extends AppCompatActivity {
 
     public static int BLOCKS_PER_DAY = 10;
-    private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol() + " ";
+    private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol();
 
     private float totalMoneyToSpend = 0.0F;
     private float currentMoneyToSpend = 0.0F;
@@ -38,6 +43,8 @@ public class SetupActivity extends AppCompatActivity {
     private TextView currency1;
     private Button saveButton;
     private Button continueButton;
+
+    private String staticBlockPrice = "0.00";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +99,12 @@ public class SetupActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
+        startActivity(intent);
+    }
+
     private void addDateSetupListeners() {
 
         continueButton.setOnTouchListener(new View.OnTouchListener() {
@@ -135,7 +148,9 @@ public class SetupActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(SetupActivity.this);
                     try {
-                        builder.setMessage("Manage spending of "+Utils.getCurrencySymbol() + Utils.formatMonetaryValue(totalMoneyToSpend) + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?");
+                        builder.setMessage("Manage spending of "+Utils.getCurrencySymbol() + Utils.formatMonetaryValue(totalMoneyToSpend)
+                                + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?"
+                                + "\n\nA single block will be worth " + Utils.getCurrencySymbol() + staticBlockPrice);
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -143,6 +158,8 @@ public class SetupActivity extends AppCompatActivity {
                                 dialog.dismiss();
 
                                 saveData();
+
+                                scheduleNotification(getNotification("5 second delay"), 5000);
 
                                 Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
                                 startActivity(intent);
@@ -222,7 +239,7 @@ public class SetupActivity extends AppCompatActivity {
         totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         payDate = preferences.getLong("next_pay_day", 0L);
-        setupDate = preferences.getLong("setup_day", 0L);
+        setupDate = preferences.getLong("setup_day", Calendar.getInstance().getTimeInMillis());
     }
 
     private void saveData() {
@@ -240,21 +257,40 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void calculateAndDisplayData() {
-        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
             payDate = Utils.getDateFromDatePicker(datePicker).getTime();
-            DecimalFormat formatter = new DecimalFormat("##.00");
+
             int daysDifference = Utils.getDaysDifference(setupDate, payDate);
-            String staticBlockPrice = formatter.format(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
+
+            staticBlockPrice = Utils.formatMonetaryValue(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
             if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
                 staticBlockPrice = "0.00";
-            }
-            if(Double.valueOf(staticBlockPrice) < 1.0) {
-                staticBlockPrice = "0" + staticBlockPrice;
             }
             blockValueText.setText(BLOCK_VALUE_TEMPLATE_TEXT_GBP + staticBlockPrice);
         } catch(Exception ex) {
 
         }
     }
+
+    private void scheduleNotification(Notification notification, int delay) {
+
+        Intent notificationIntent = new Intent(this, NotificationPublisher.class);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, 1);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                futureInMillis, futureInMillis, pendingIntent);
+    }
+
+    private Notification getNotification(String content) {
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentTitle("Scheduled Notification");
+        builder.setContentText(content);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        return builder.build();
+    }
+
 }
