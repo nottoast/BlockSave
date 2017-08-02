@@ -20,14 +20,14 @@ public class Utils {
     public static void main(String[] args) {
 
         Float totalMoney = 300.0F;
-        Float currentMoney = 290.0F;
+        Float currentMoney = 260.0F;
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date payDate = null;
         Date setupDate = null;
         try {
             payDate = sdf.parse("31/08/2017");
-            setupDate = sdf.parse("30/07/2017");
+            setupDate = sdf.parse("02/08/2017");
         } catch(Exception ex) {
         }
 
@@ -37,21 +37,21 @@ public class Utils {
         System.out.println("Number of days until pay day: " + getNumberOfDaysUntilPayDay(payDate.getTime()));
 
         double staticBlockPrice = getStaticBlockPrice(totalMoney, daysDifference);
-        System.out.println("Static block price: "+staticBlockPrice);
+        //System.out.println("Static block price: "+staticBlockPrice);
 
         System.out.println(getBlocksToDisplay(currentMoney, setupDate.getTime(), payDate.getTime(), staticBlockPrice, BLOCKS_PER_DAY));
         System.out.println(getBlockBudgetFromTomorrow(setupDate.getTime(), payDate.getTime(), currentMoney, staticBlockPrice));
         System.out.println("------------------------------------------------------");
 
-        System.out.println(getDayNumber(setupDate.getTime()));
-        System.out.println("------------------------------------------------------");
-        System.out.println(getUnderSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
-        System.out.println(getOverSpendValue(setupDate.getTime(), payDate.getTime(), totalMoney, currentMoney));
-        System.out.println("------------------------------------------------------");
-        System.out.println("Get blocks to deduct: " + getBlocksToDeduct(totalMoney, currentMoney, 5.00, staticBlockPrice, setupDate.getTime(), payDate.getTime(), BLOCKS_PER_DAY));
-        System.out.println("------------------------------------------------------");
-        System.out.println("Rounded date: " + roundDate(1501013510654L));
-        System.out.println("Rounded date (formatted): " + new Date(roundDate(1501013510654L)));
+        //System.out.println(getDayNumber(setupDate.getTime()));
+        //System.out.println("------------------------------------------------------");
+        System.out.println("Under spend value: " + getUnderSpendValue(setupDate.getTime(), payDate.getTime(), currentMoney, staticBlockPrice));
+        System.out.println("Over spend value: " + getOverSpendValue(setupDate.getTime(), payDate.getTime(), currentMoney, staticBlockPrice));
+        //System.out.println("------------------------------------------------------");
+        //System.out.println("Get blocks to deduct: " + getBlocksToDeduct(totalMoney, currentMoney, 5.00, staticBlockPrice, setupDate.getTime(), payDate.getTime(), BLOCKS_PER_DAY));
+        //System.out.println("------------------------------------------------------");
+        //System.out.println("Rounded date: " + roundDate(1501013510654L));
+        //System.out.println("Rounded date (formatted): " + new Date(roundDate(1501013510654L)));
 
     }
 
@@ -114,19 +114,23 @@ public class Utils {
         return Math.round(currentBlocksAvailableInteger - blocksToDeduct);
     }
 
-    public static long getBlockBudgetFromTomorrow(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
+    public static double getDoubleBlockBudgetFromTomorrow(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
 
         int daysDifference = getDaysDifference(setupDay, payDate);
         int daysPassed = getDayNumber(setupDay);
         double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
         double daysToDivide = (daysDifference - (daysPassed));
-
         if(daysToDivide == 0) {
             return 0;
         }
+        double tomorrowsBlocks = currentBlocksAvailable / daysToDivide;
 
-        double tomorrowsBlocks = (currentBlocksAvailable) / daysToDivide;
-        long tomorrowsBlocksRounded = ((Double)Math.floor(tomorrowsBlocks)).intValue();
+        return tomorrowsBlocks;
+    }
+
+    public static long getBlockBudgetFromTomorrow(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
+
+        long tomorrowsBlocksRounded = ((Double)Math.floor(getDoubleBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice))).intValue();
 
         return tomorrowsBlocksRounded;
     }
@@ -136,49 +140,30 @@ public class Utils {
         return currency.getSymbol();
     }
 
-    public static long getUnderSpendValue(long setupDay, long payDate, double totalMoneyToSpend, double currentMoneyToSpend) {
+    public static long getUnderSpendValue(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
 
+        double blockBudgetTomorrow = getDoubleBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice);
+        double blockValueThreshold = Math.ceil(blockBudgetTomorrow + 0.00000001);
+        double blockValueDifference = blockValueThreshold - blockBudgetTomorrow;
         int daysDifference = getDaysDifference(setupDay, payDate);
-        double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
-        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
-        double tomorrowsBlocks = getBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice)+0.01;
+        double blockValueDifferenceTotal = blockValueDifference * (daysDifference - daysPassed);
+        Double blockSpendValue = Math.floor(blockValueDifferenceTotal);
 
-        int underSpendValue = -1;
-        while(true) {
-            underSpendValue++;
-            double calculatedAdjustment = (currentBlocksAvailable + underSpendValue) / (daysDifference - (daysPassed));
-            if(calculatedAdjustment > tomorrowsBlocks + 1.0) {
-                break;
-            }
-            if (underSpendValue > 99) {
-                break;
-            }
-        }
-        return underSpendValue;
+        return blockSpendValue.intValue();
     }
 
-    public static int getOverSpendValue(long setupDay, long payDate, double totalMoneyToSpend, double currentMoneyToSpend) {
+    public static int getOverSpendValue(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
 
+        double blockBudgetTomorrow = getDoubleBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice);
+        double blockValueThreshold = Math.floor(blockBudgetTomorrow) - 0.00000001;
+        double blockValueDifference = blockBudgetTomorrow - blockValueThreshold;
         int daysDifference = getDaysDifference(setupDay, payDate);
-        double staticBlockPrice = getStaticBlockPrice(totalMoneyToSpend, daysDifference);
         int daysPassed = getDayNumber(setupDay);
-        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
-        double tomorrowsBlocks = getBlockBudgetFromTomorrow(setupDay, payDate, currentMoneyToSpend, staticBlockPrice);
+        double blockValueDifferenceTotal = blockValueDifference * (daysDifference - daysPassed);
+        Double blockSpendValue = Math.floor(blockValueDifferenceTotal) + 1;
 
-        int overSpendValue = -1;
-        while(true) {
-            overSpendValue++;
-            double calculatedAdjustment = (currentBlocksAvailable - overSpendValue) / (daysDifference - (daysPassed));
-            if(tomorrowsBlocks > calculatedAdjustment) {
-                break;
-            }
-            if (overSpendValue > 99) {
-                break;
-            }
-        }
-
-        return overSpendValue;
+        return blockSpendValue.intValue();
     }
 
     public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate, long todaysBlocks) {
