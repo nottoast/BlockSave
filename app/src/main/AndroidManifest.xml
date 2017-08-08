@@ -25,6 +25,15 @@
             android:name=".HelpActivity"
             android:launchMode="singleTask">
         </activity>
-        <receiver android:name=".NotificationPublisher" />
+
+        <receiver android:name=".NotificationsService"/>
+
+        <receiver android:name=".RebootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     </application>
 </manifest>

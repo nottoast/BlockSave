@@ -10,11 +10,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.util.Calendar;
 
 public class HelpActivity extends AppCompatActivity {
 
+    private LinearLayout helpTextLayout;
+    private LinearLayout helpTextButtonLayout;
     private Button continueButton;
 
     @Override
@@ -27,6 +30,9 @@ public class HelpActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setContentView(R.layout.activity_help);
+
+        findHelpScreenElements();
+
         loadData();
         addListeners();
     }
@@ -68,6 +74,16 @@ public class HelpActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void findHelpScreenElements() {
+        helpTextLayout = (LinearLayout) findViewById(R.id.helpTextLayout);
+        helpTextButtonLayout = (LinearLayout) findViewById(R.id.helpTextButtonLayout);
+
+        helpTextLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
+        helpTextButtonLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
+
+        continueButton = (Button) findViewById(R.id.continueButton1);
+    }
+
     private void saveData() {
         SharedPreferences settings = getSharedPreferences("block_save_data", 0);
         SharedPreferences.Editor editor = settings.edit();
@@ -76,7 +92,6 @@ public class HelpActivity extends AppCompatActivity {
     }
 
     private void addListeners() {
-        continueButton = (Button) findViewById(R.id.continueButton1);
         continueButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

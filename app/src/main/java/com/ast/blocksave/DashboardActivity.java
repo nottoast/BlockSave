@@ -30,11 +30,12 @@ import static com.ast.blocksave.SetupActivity.BLOCKS_PER_DAY;
 
 public class DashboardActivity extends AppCompatActivity {
 
+    public static int ELEVATION_HEIGHT = 6;
+
     private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() ;
     private String TODAYS_BLOCKS_POSITIVE = "Blocks left to spend today:";
     private String TODAYS_BLOCKS_NEGATIVE = "Blocks you have over spent:";
     private long BLOCK_DISPLAY_LIMIT = 14;
-    private int ELEVATION_HEIGHT = 6;
     private String OVER_SPEND_ZERO_TEXT = "Tomorrows budget is";
     private String OVER_SPEND_BLOCK_ZERO_TEXT = "  0 blocks";
 
@@ -156,7 +157,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 + Utils.getCurrencySymbol()
                                 + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + "?"
                                 + "\n\nThis will cost "
-                                + blocksToDeductString + ".");
+                                + blocksToDeductString + "\n");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -420,7 +421,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         } else {
 
-            long underSpend = Utils.getUnderSpendValue(setupDay, nextPayDay, totalMoneyToSpend, currentMoneyToSpend);
+            long underSpend = Utils.getUnderSpendValue(setupDay, nextPayDay, currentMoneyToSpend, staticBlockPrice);
             if (underSpend < 10) {
                 if (underSpend == 1) {
                     underSpendOutput.setText("  " + underSpend + " block");
@@ -433,7 +434,7 @@ public class DashboardActivity extends AppCompatActivity {
                 underSpendOutput.setText(" " + underSpend + " blocks");
             }
 
-            int overSpend = Utils.getOverSpendValue(setupDay, nextPayDay, totalMoneyToSpend, currentMoneyToSpend);
+            int overSpend = Utils.getOverSpendValue(setupDay, nextPayDay, currentMoneyToSpend, staticBlockPrice);
             if (overSpend < 10) {
                 if (overSpend == 1) {
                     overSpendOutput.setText("  " + overSpend + " block");
