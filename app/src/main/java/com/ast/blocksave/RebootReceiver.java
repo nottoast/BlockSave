@@ -13,29 +13,30 @@ public class RebootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //Calendar calendar = this.getMyCalendar();
-        //this.scheduleAlarms(context, calendar);
-        System.out.println("Test");
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 7);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        scheduleNotification(context, getNotification(context, "7am BlockSave notification"), calendar);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        scheduleNotification(context, getNotification(context, "2pm BlockSave notification"), calendar);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        scheduleNotification(context, getNotification(context, "9pm BlockSave notification"), calendar);
     }
 
-    /*
-    private Calendar getMyCalendar() {
-        // get your calendar object
-        return new Calendar.getInstance();
-    }
-    */
-
-    private void scheduleAlarms(Context context, Calendar calendar) {
-        /*
-
-        Intent i = new Intent(context, ScheduledService.class);
-        i.putExtra(ALARM_ID, 1);
-        i.putExtra(NOTIFICATION_ID, 1);
-        */
+    private void scheduleNotification(Context context, Notification notification, Calendar calendar) {
 
         Intent notificationIntent = new Intent(context, NotificationsService.class);
         notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, 1);
-        notificationIntent.putExtra(NotificationsService.NOTIFICATION, getNotification(context, "BlockSave Notification"));
+        notificationIntent.putExtra(NotificationsService.NOTIFICATION, notification);
 
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

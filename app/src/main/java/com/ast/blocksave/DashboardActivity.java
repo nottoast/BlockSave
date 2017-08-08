@@ -324,18 +324,17 @@ public class DashboardActivity extends AppCompatActivity {
 
             if(i >= numberOfBlocksToDisplay - numberOfBlocksToHighlight) {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_2);
-                textView.setTextColor(Color.BLACK);
+                textView.setTextColor(Color.DKGRAY);
 
                 if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
-                    textView.setTextColor(Color.BLACK);
-                    //textView.setText("  1  ");
+                    textView.setTextColor(Color.DKGRAY);
                 }
             } else {
                 drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.block_style_1);
                 textView.setTextColor(ContextCompat.getColor(this, R.color.block_colour));
 
                 if(i >= BLOCK_DISPLAY_LIMIT - spareBlocks) {
-                    textView.setTextColor(Color.BLACK);
+                    textView.setTextColor(Color.DKGRAY);
                     textView.setText(" 2 ");
                 }
             }

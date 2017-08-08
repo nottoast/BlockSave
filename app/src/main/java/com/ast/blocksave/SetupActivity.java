@@ -305,10 +305,21 @@ public class SetupActivity extends AppCompatActivity {
     private void scheduleNotifications() {
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 51);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 7);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        scheduleNotification(getNotification("BlockSave Notification"), calendar);
+        scheduleNotification(getNotification("7am BlockSave notification"), calendar);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 2);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        scheduleNotification(getNotification("2pm BlockSave notification"), calendar);
+
+        calendar.set(Calendar.HOUR_OF_DAY, 9);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        scheduleNotification(getNotification("9pm BlockSave notification"), calendar);
 
     }
 

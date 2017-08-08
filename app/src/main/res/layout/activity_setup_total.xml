@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="12dp"
-                android:text="Enter amount to save:"
+                android:text="Enter amount:"
                 android:textSize="20sp" />
 
             <TextView
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="12dp"
-                android:text="10pm notification?"
+                android:text="9pm notification?"
                 android:textSize="20sp" />
 
             <CheckBox
@@ -208,7 +208,7 @@
 
             <Button
                 android:id="@+id/saveButton"
-                android:layout_width="140dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:layout_weight="0.11"
