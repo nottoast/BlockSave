@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,6 +26,10 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static com.ast.blocksave.NotificationsService.EVENING_NOTIFICATION_HOUR;
+import static com.ast.blocksave.NotificationsService.MIDDAY_NOTIFICATION_HOUR;
+import static com.ast.blocksave.NotificationsService.MORINNG_NOTIFICATION_HOUR;
 
 public class SetupActivity extends AppCompatActivity {
 
@@ -41,9 +46,9 @@ public class SetupActivity extends AppCompatActivity {
     private LinearLayout dateContinueLayout;
     private LinearLayout enterAmountLayout;
     private LinearLayout blockWorthLayout;
-    private LinearLayout morningNotification;
+    private LinearLayout morningNotificationLayout;
     private LinearLayout middayNotification;
-    private LinearLayout eveningNotification;
+    private LinearLayout eveningNotificationLayout;
     private LinearLayout saveLayout;
 
     private DatePicker datePicker;
@@ -54,6 +59,14 @@ public class SetupActivity extends AppCompatActivity {
     private Button continueButton;
 
     private String staticBlockPrice = "0.00";
+
+    private CheckBox morningCheckbox;
+    private CheckBox afternoonCheckbox;
+    private CheckBox eveningCheckbox;
+
+    private boolean morningNotification;
+    private boolean afternoonNotification;
+    private boolean eveningNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,16 +256,16 @@ public class SetupActivity extends AppCompatActivity {
 
         enterAmountLayout = (LinearLayout) findViewById(R.id.enterAmountLayout);
         blockWorthLayout = (LinearLayout) findViewById(R.id.blockWorthLayout);
-        morningNotification = (LinearLayout) findViewById(R.id.morningNotification);
+        morningNotificationLayout = (LinearLayout) findViewById(R.id.morningNotification);
         middayNotification = (LinearLayout) findViewById(R.id.middayNotification);
-        eveningNotification = (LinearLayout) findViewById(R.id.eveningNotification);
+        eveningNotificationLayout = (LinearLayout) findViewById(R.id.eveningNotification);
         saveLayout = (LinearLayout) findViewById(R.id.saveLayout);
 
         enterAmountLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         blockWorthLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
-        morningNotification.setElevation(DashboardActivity.ELEVATION_HEIGHT);
+        morningNotificationLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         middayNotification.setElevation(DashboardActivity.ELEVATION_HEIGHT);
-        eveningNotification.setElevation(DashboardActivity.ELEVATION_HEIGHT);
+        eveningNotificationLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         saveLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
 
         budget = (EditText) findViewById(R.id.budget);
@@ -261,14 +274,34 @@ public class SetupActivity extends AppCompatActivity {
         blockValueText = (TextView) findViewById(R.id.blockValueText);
         currency1 = (TextView) findViewById(R.id.currency1);
         currency1.setText(Utils.getCurrencySymbol());
+
+        morningCheckbox = (CheckBox) findViewById(R.id.morningCheckbox);
+        if(morningNotification) {
+            morningCheckbox.setChecked(true);
+        }
+        afternoonCheckbox = (CheckBox) findViewById(R.id.afternoonCheckbox);
+        if(afternoonNotification) {
+            afternoonCheckbox.setChecked(true);
+        }
+        eveningCheckbox = (CheckBox) findViewById(R.id.eveningCheckbox);
+        if(eveningNotification) {
+            eveningCheckbox.setChecked(true);
+        }
     }
 
     private void loadData() {
+
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
+
         totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         payDate = preferences.getLong("next_pay_day", 0L);
         setupDate = preferences.getLong("setup_day", Calendar.getInstance().getTimeInMillis());
+
+        morningNotification = preferences.getBoolean("morning_notification", false);
+        afternoonNotification = preferences.getBoolean("afternoon_notification", false);
+        eveningNotification = preferences.getBoolean("evening_notification", false);
+
     }
 
     private void saveData() {
@@ -282,6 +315,29 @@ public class SetupActivity extends AppCompatActivity {
         editor.putBoolean("help_visited", true);
         editor.putLong("block_count", BLOCKS_PER_DAY);
         editor.putLong("block_count_day", setupDate);
+
+        if(morningCheckbox.isChecked()) {
+            morningNotification = true;
+            editor.putBoolean("morning_notification", true);
+        } else {
+            morningNotification = false;
+            editor.putBoolean("morning_notification", false);
+        }
+        if(afternoonCheckbox.isChecked()) {
+            afternoonNotification = true;
+            editor.putBoolean("afternoon_notification", true);
+        } else {
+            afternoonNotification = false;
+            editor.putBoolean("afternoon_notification", false);
+        }
+        if(eveningCheckbox.isChecked()) {
+            eveningNotification = true;
+            editor.putBoolean("evening_notification", true);
+        } else {
+            eveningNotification = false;
+            editor.putBoolean("evening_notification", false);
+        }
+
         editor.commit();
     }
 
@@ -301,48 +357,53 @@ public class SetupActivity extends AppCompatActivity {
         }
     }
 
-
     private void scheduleNotifications() {
 
         Calendar calendar = Calendar.getInstance();
 
-        calendar.set(Calendar.HOUR_OF_DAY, 7);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        scheduleNotification(getNotification("7am BlockSave notification"), calendar);
+        if(morningNotification) {
+            calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, false);
+        }
 
-        calendar.set(Calendar.HOUR_OF_DAY, 2);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        scheduleNotification(getNotification("2pm BlockSave notification"), calendar);
+        if(afternoonNotification) {
+            calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, false);
+        }
 
-        calendar.set(Calendar.HOUR_OF_DAY, 9);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        scheduleNotification(getNotification("9pm BlockSave notification"), calendar);
+        if(eveningNotification) {
+            calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, false);
+        }
 
     }
 
-    private void scheduleNotification(Notification notification, Calendar calendar) {
+    private void scheduleNotification(Calendar calendar, int notificationId, boolean run) {
 
         Intent notificationIntent = new Intent(this, NotificationsService.class);
-        notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, 1);
-        notificationIntent.putExtra(NotificationsService.NOTIFICATION, notification);
+        notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, notificationId);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-    }
 
-    private Notification getNotification(String content) {
-
-        Notification.Builder builder = new Notification.Builder(this);
-        builder.setContentTitle("Scheduled Notification");
-        builder.setContentText(content);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
-
-        return builder.build();
+        if(run) {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        } else {
+            alarmManager.cancel(pendingIntent);
+        }
     }
 
 }

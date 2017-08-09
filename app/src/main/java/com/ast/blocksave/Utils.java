@@ -106,12 +106,20 @@ public class Utils {
         return staticBlockPrice;
     }
 
-    public static long getBlocksToDisplay(double currentMoneyToSpend, long setupDay, long payDate, double staticBlockPrice, long todaysBlocks) {
+    public static long getBlocksToDisplayRounded(double currentMoneyToSpend, long payDate, double staticBlockPrice, long todaysBlocks) {
 
-        double currentBlocksAvailableInteger = ((currentMoneyToSpend) / staticBlockPrice);
+        double currentBlocksAvailableInteger = Math.ceil((currentMoneyToSpend) / staticBlockPrice);
         double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * todaysBlocks;
 
         return Math.round(currentBlocksAvailableInteger - blocksToDeduct);
+    }
+
+    public static double getBlocksToDisplay(double currentMoneyToSpend, long setupDay, long payDate, double staticBlockPrice, long todaysBlocks) {
+
+        double currentBlocksAvailableInteger = Math.ceil((currentMoneyToSpend) / staticBlockPrice);
+        double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * todaysBlocks;
+
+        return currentBlocksAvailableInteger - blocksToDeduct;
     }
 
     public static double getDoubleBlockBudgetFromTomorrow(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
@@ -148,7 +156,7 @@ public class Utils {
         int daysDifference = getDaysDifference(setupDay, payDate);
         int daysPassed = getDayNumber(setupDay);
         double blockValueDifferenceTotal = blockValueDifference * (daysDifference - daysPassed);
-        Double blockSpendValue = Math.floor(blockValueDifferenceTotal);
+        Double blockSpendValue = Math.ceil(blockValueDifferenceTotal);
 
         return blockSpendValue.intValue();
     }
@@ -174,7 +182,9 @@ public class Utils {
         //double newDisplayBlocks = Math.round((currentMoneyToSpend - purchaseAmount) / staticBlockPrice);
         double newDisplayBlocks = getBlocksToDisplay(currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice, todaysBlocks);
 
-        return Math.round(currentDisplayedBlocks - newDisplayBlocks);
+        long blocksToDeduct = Math.round(currentDisplayedBlocks - newDisplayBlocks);
+
+        return blocksToDeduct;
     }
 
     public static long getTotalBlocksAvailable(float totalMoneyToSpend, Double staticBlockPrice) {

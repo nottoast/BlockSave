@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -212,19 +213,25 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private boolean loadData() {
+
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
+
         totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         setupDay = preferences.getLong("setup_day", 0L);
+
         return preferences.getBoolean("help_visited", false);
     }
 
     private void saveData() {
+
         SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+
         SharedPreferences.Editor editor = settings.edit();
         editor.putFloat("current_money_to_spend", currentMoneyToSpend);
         editor.putBoolean("help_visited", true);
+
         editor.commit();
     }
 
@@ -368,7 +375,7 @@ public class DashboardActivity extends AppCompatActivity {
             if(blockCount == 0L) {
                 blockCount = BLOCKS_PER_DAY;
             }
-            blockCount = Utils.getBlocksToDisplay(currentMoneyToSpend, setupDay, nextPayDay, staticBlockPrice, blockCount);
+            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
             blockCountDay = Calendar.getInstance().getTimeInMillis();
             saveTodaysBlocksData();
         }
@@ -385,7 +392,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         String blocksToDisplayString = "";
-        long blocksToDisplay = Utils.getBlocksToDisplay(currentMoneyToSpend, setupDay, nextPayDay, staticBlockPrice, blockCount);
+        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
         long blocksToShow = blocksToDisplay;
 
         if (blocksToDisplay < 0) {
@@ -451,7 +458,6 @@ public class DashboardActivity extends AppCompatActivity {
             if(tomorrowsBudget < 1) {
 
                 tomorrowInfoLayout.removeView(blocksOverLayout);
-
                 tomorrowInfoLayout.removeView(overSpendLayout);
 
                 ViewGroup.LayoutParams layoutParams = tomorrowInfoLayout.getLayoutParams();
@@ -459,12 +465,27 @@ public class DashboardActivity extends AppCompatActivity {
                 tomorrowInfoLayout.setLayoutParams(layoutParams);
 
                 overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
-
                 overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
-
                 overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
 
-            } else {
+            }
+            /*
+            else if(underSpend > blocksToShow) {
+
+                tomorrowInfoLayout.removeView(blocksOverLayout);
+                tomorrowInfoLayout.removeView(overSpendLayout);
+
+                ViewGroup.LayoutParams layoutParams = tomorrowInfoLayout.getLayoutParams();
+                layoutParams.height = Utils.convertDpToPixels(132.0F, this.getApplicationContext());
+                tomorrowInfoLayout.setLayoutParams(layoutParams);
+
+                overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
+                overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
+                overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
+
+            }
+            */
+            else {
 
                 if (tomorrowsBudget < 10) {
                     if (tomorrowsBudget == 1) {
