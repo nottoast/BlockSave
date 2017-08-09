@@ -61,7 +61,7 @@ public class DashboardActivity extends AppCompatActivity {
     private GridLayout topLevelGridLayout;
     private GridLayout dayCountLayout;
     private GridLayout blocksToSpendLayout;
-    private GridLayout purchaseEntryLayout;
+    private GridLayout purchaseEntryGridLayout;
     private GridLayout tomorrowInfoLayout;
 
     private TextView blocksToSpendToday;
@@ -257,8 +257,8 @@ public class DashboardActivity extends AppCompatActivity {
         dayCountLayout.setElevation(ELEVATION_HEIGHT);
         blocksToSpendLayout = (GridLayout) findViewById(R.id.blocksToSpendLayout);
         blocksToSpendLayout.setElevation(ELEVATION_HEIGHT);
-        purchaseEntryLayout = (GridLayout) findViewById(R.id.purchaseEntryLayout);
-        purchaseEntryLayout.setElevation(ELEVATION_HEIGHT);
+        purchaseEntryGridLayout = (GridLayout) findViewById(R.id.purchaseEntryGridLayout);
+        purchaseEntryGridLayout.setElevation(ELEVATION_HEIGHT);
         tomorrowInfoLayout = (GridLayout) findViewById(R.id.tomorrowInfoLayout);
         tomorrowInfoLayout.setElevation(ELEVATION_HEIGHT);
 

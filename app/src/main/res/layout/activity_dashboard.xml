@@ -111,7 +111,7 @@
         </GridLayout>
 
         <GridLayout
-            android:id="@+id/purchaseEntryLayout"
+            android:id="@+id/purchaseEntryGridLayout"
             android:layout_width="match_parent"
             android:layout_height="111dp"
             android:layout_column="0"

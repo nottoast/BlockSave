@@ -359,33 +359,34 @@ public class SetupActivity extends AppCompatActivity {
 
     private void scheduleNotifications() {
 
-        Calendar calendar = Calendar.getInstance();
-
         if(morningNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, false);
+            scheduleNotification(Calendar.getInstance(), MORINNG_NOTIFICATION_HOUR, false);
         }
 
         if(afternoonNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, false);
+            scheduleNotification(Calendar.getInstance(), MIDDAY_NOTIFICATION_HOUR, false);
         }
 
         if(eveningNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, false);
+            scheduleNotification(Calendar.getInstance(), EVENING_NOTIFICATION_HOUR, false);
         }
 
     }

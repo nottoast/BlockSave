@@ -25,33 +25,34 @@ public class RebootReceiver extends BroadcastReceiver {
 
         loadData(context);
 
-        Calendar calendar = Calendar.getInstance();
-
         if(morningNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(context, calendar, MORINNG_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(context, calendar, MORINNG_NOTIFICATION_HOUR, false);
+            scheduleNotification(context, Calendar.getInstance(), MORINNG_NOTIFICATION_HOUR, false);
         }
 
         if(afternoonNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(context, calendar, MIDDAY_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(context, calendar, MIDDAY_NOTIFICATION_HOUR, false);
+            scheduleNotification(context, Calendar.getInstance(), MIDDAY_NOTIFICATION_HOUR, false);
         }
 
         if(eveningNotification) {
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             scheduleNotification(context, calendar, EVENING_NOTIFICATION_HOUR, true);
         } else {
-            scheduleNotification(context, calendar, EVENING_NOTIFICATION_HOUR, false);
+            scheduleNotification(context, Calendar.getInstance(), EVENING_NOTIFICATION_HOUR, false);
         }
     }
 
