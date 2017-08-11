@@ -545,7 +545,7 @@ public class DashboardActivity extends AppCompatActivity {
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
 
-            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+            if(calendar.getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
                 calendar.add(Calendar.DATE, 1);
             }
 
@@ -562,7 +562,7 @@ public class DashboardActivity extends AppCompatActivity {
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
 
-            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+            if(calendar.getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
                 calendar.add(Calendar.DATE, 1);
             }
 
@@ -579,7 +579,7 @@ public class DashboardActivity extends AppCompatActivity {
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
 
-            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+            if(calendar.getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
                 calendar.add(Calendar.DATE, 1);
             }
 
