@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -45,7 +46,8 @@ public class SetupActivity extends AppCompatActivity {
     private LinearLayout dateContinueLayout;
     private LinearLayout enterAmountLayout;
     private LinearLayout blockWorthLayout;
-    private LinearLayout notificationLayout;
+
+    private GridLayout notificationLayout;
     private LinearLayout morningNotificationLayout;
     private LinearLayout middayNotification;
     private LinearLayout eveningNotificationLayout;
@@ -261,7 +263,7 @@ public class SetupActivity extends AppCompatActivity {
         enterAmountLayout = (LinearLayout) findViewById(R.id.enterAmountLayout);
         blockWorthLayout = (LinearLayout) findViewById(R.id.blockWorthLayout);
 
-        notificationLayout = (LinearLayout) findViewById(R.id.morningNotification);
+        notificationLayout = (GridLayout) findViewById(R.id.notificationLayout);
         morningNotificationLayout = (LinearLayout) findViewById(R.id.morningNotification);
         middayNotification = (LinearLayout) findViewById(R.id.middayNotification);
         eveningNotificationLayout = (LinearLayout) findViewById(R.id.eveningNotification);
