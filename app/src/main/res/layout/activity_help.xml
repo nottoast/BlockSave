@@ -32,7 +32,7 @@
         <LinearLayout
             android:id="@+id/helpTextLayout"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="290dp"
             android:layout_column="0"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"

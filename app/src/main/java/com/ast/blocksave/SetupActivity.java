@@ -45,6 +45,7 @@ public class SetupActivity extends AppCompatActivity {
     private LinearLayout dateContinueLayout;
     private LinearLayout enterAmountLayout;
     private LinearLayout blockWorthLayout;
+    private LinearLayout notificationLayout;
     private LinearLayout morningNotificationLayout;
     private LinearLayout middayNotification;
     private LinearLayout eveningNotificationLayout;
@@ -259,6 +260,8 @@ public class SetupActivity extends AppCompatActivity {
 
         enterAmountLayout = (LinearLayout) findViewById(R.id.enterAmountLayout);
         blockWorthLayout = (LinearLayout) findViewById(R.id.blockWorthLayout);
+
+        notificationLayout = (LinearLayout) findViewById(R.id.morningNotification);
         morningNotificationLayout = (LinearLayout) findViewById(R.id.morningNotification);
         middayNotification = (LinearLayout) findViewById(R.id.middayNotification);
         eveningNotificationLayout = (LinearLayout) findViewById(R.id.eveningNotification);
@@ -266,6 +269,8 @@ public class SetupActivity extends AppCompatActivity {
 
         enterAmountLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         blockWorthLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
+
+        notificationLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         morningNotificationLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         middayNotification.setElevation(DashboardActivity.ELEVATION_HEIGHT);
         eveningNotificationLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);

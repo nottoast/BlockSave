@@ -538,38 +538,59 @@ public class DashboardActivity extends AppCompatActivity {
     private void scheduleNotifications() {
 
         if(morningNotification) {
+
             Calendar calendar = Calendar.getInstance();
+
             calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, true);
+
+            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                calendar.add(Calendar.DATE, 1);
+            }
+
+            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR);
         } else {
-            scheduleNotification(Calendar.getInstance(), MORINNG_NOTIFICATION_HOUR, false);
+            scheduleNotification(MORINNG_NOTIFICATION_HOUR);
         }
 
         if(afternoonNotification) {
+
             Calendar calendar = Calendar.getInstance();
+
             calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, true);
+
+            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                calendar.add(Calendar.DATE, 1);
+            }
+
+            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR);
         } else {
-            scheduleNotification(Calendar.getInstance(), MIDDAY_NOTIFICATION_HOUR, false);
+            scheduleNotification(MIDDAY_NOTIFICATION_HOUR);
         }
 
         if(eveningNotification) {
+
             Calendar calendar = Calendar.getInstance();
+
             calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, true);
+
+            if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                calendar.add(Calendar.DATE, 1);
+            }
+
+            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR);
         } else {
-            scheduleNotification(Calendar.getInstance(), EVENING_NOTIFICATION_HOUR, false);
+            scheduleNotification(EVENING_NOTIFICATION_HOUR);
         }
 
     }
 
-    private void scheduleNotification(Calendar calendar, int notificationId, boolean run) {
+    private void scheduleNotification(int notificationId) {
 
         Intent notificationIntent = new Intent(this, NotificationsService.class);
         notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, notificationId);
@@ -578,11 +599,19 @@ public class DashboardActivity extends AppCompatActivity {
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        if(run) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        } else {
-            alarmManager.cancel(pendingIntent);
-        }
+        alarmManager.cancel(pendingIntent);
+    }
+
+    private void scheduleNotification(Calendar calendar, int notificationId) {
+
+        Intent notificationIntent = new Intent(this, NotificationsService.class);
+        notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, notificationId);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
 }
