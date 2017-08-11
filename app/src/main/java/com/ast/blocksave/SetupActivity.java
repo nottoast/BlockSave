@@ -34,7 +34,6 @@ import static com.ast.blocksave.NotificationsService.MORINNG_NOTIFICATION_HOUR;
 public class SetupActivity extends AppCompatActivity {
 
     public static int BLOCKS_PER_DAY = 10;
-    private String BLOCK_VALUE_TEMPLATE_TEXT_GBP = "A block is worth  " + Utils.getCurrencySymbol();
 
     private float totalMoneyToSpend = 0.0F;
     private float currentMoneyToSpend = 0.0F;
@@ -68,6 +67,8 @@ public class SetupActivity extends AppCompatActivity {
     private boolean afternoonNotification;
     private boolean eveningNotification;
 
+    private String currencySymbol = "$";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +79,11 @@ public class SetupActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setContentView(R.layout.activity_setup_date);
+
         loadData();
 
         findDateSetupScreenElements();
+
         addDateSetupListeners();
 
         calculateAndDisplayData();
@@ -170,9 +173,9 @@ public class SetupActivity extends AppCompatActivity {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(SetupActivity.this);
                     try {
-                        builder.setMessage("Manage spending of "+Utils.getCurrencySymbol() + Utils.formatMonetaryValue(totalMoneyToSpend)
+                        builder.setMessage("Manage spending of " + currencySymbol + Utils.formatMonetaryValue(totalMoneyToSpend)
                                 + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?"
-                                + "\n\nA single block will be worth " + Utils.getCurrencySymbol() + staticBlockPrice + "\n");
+                                + "\n\nA single block will be worth " + currencySymbol + staticBlockPrice + "\n");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -180,8 +183,6 @@ public class SetupActivity extends AppCompatActivity {
                                 dialog.dismiss();
 
                                 saveData();
-
-                                scheduleNotifications();
 
                                 Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
                                 startActivity(intent);
@@ -230,6 +231,8 @@ public class SetupActivity extends AppCompatActivity {
 
     private void findDateSetupScreenElements() {
 
+        currencySymbol = Utils.getCurrencySymbol(this);
+
         datePickerLayout = (LinearLayout) findViewById(R.id.datePickerLayout);
         dateContinueLayout = (LinearLayout) findViewById(R.id.dateContinueLayout);
 
@@ -273,7 +276,7 @@ public class SetupActivity extends AppCompatActivity {
         saveButton = (Button) findViewById(R.id.saveButton);
         blockValueText = (TextView) findViewById(R.id.blockValueText);
         currency1 = (TextView) findViewById(R.id.currency1);
-        currency1.setText(Utils.getCurrencySymbol());
+        currency1.setText(currencySymbol);
 
         morningCheckbox = (CheckBox) findViewById(R.id.morningCheckbox);
         if(morningNotification) {
@@ -351,59 +354,9 @@ public class SetupActivity extends AppCompatActivity {
             if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
                 staticBlockPrice = "0.00";
             }
-            blockValueText.setText(BLOCK_VALUE_TEMPLATE_TEXT_GBP + staticBlockPrice);
+            blockValueText.setText("A block is worth  " + currencySymbol + staticBlockPrice);
         } catch(Exception ex) {
 
-        }
-    }
-
-    private void scheduleNotifications() {
-
-        if(morningNotification) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, true);
-        } else {
-            scheduleNotification(Calendar.getInstance(), MORINNG_NOTIFICATION_HOUR, false);
-        }
-
-        if(afternoonNotification) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, true);
-        } else {
-            scheduleNotification(Calendar.getInstance(), MIDDAY_NOTIFICATION_HOUR, false);
-        }
-
-        if(eveningNotification) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, true);
-        } else {
-            scheduleNotification(Calendar.getInstance(), EVENING_NOTIFICATION_HOUR, false);
-        }
-
-    }
-
-    private void scheduleNotification(Calendar calendar, int notificationId, boolean run) {
-
-        Intent notificationIntent = new Intent(this, NotificationsService.class);
-        notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, notificationId);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        if(run) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        } else {
-            alarmManager.cancel(pendingIntent);
         }
     }
 

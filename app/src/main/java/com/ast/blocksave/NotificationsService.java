@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import java.text.DecimalFormat;
+import java.util.Calendar;
 
 public class NotificationsService extends BroadcastReceiver {
 
@@ -23,6 +24,7 @@ public class NotificationsService extends BroadcastReceiver {
     private long nextPayDay;
     private double staticBlockPrice;
     private long blockCount;
+    private long blockCountDay;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -56,14 +58,16 @@ public class NotificationsService extends BroadcastReceiver {
         builder.setContentTitle(contentTitle);
 
         String contentText = "";
-        if(blocksToDisplay > 1) {
+        if(!Utils.isTheSameDay(blockCountDay, Calendar.getInstance().getTimeInMillis())) {
+            contentText = "Please open BlockSave to see what today's budget is";
+        } else if(blocksToDisplay > 1) {
             contentText = "You have " + blocksToDisplay + " blocks left to spend today";
         } else if(blocksToDisplay == 1) {
             contentText = "You have " + blocksToDisplay + " block left to spend today";
         } else if(blocksToDisplay == 0) {
             contentText = "You have no blocks left to spend today";
         } else if(blocksToDisplay < 0) {
-            contentText = "You have overspent by " + (blocksToDisplay*-1) + " blocks left to spend today";
+            contentText = "You have overspent by " + (blocksToDisplay*-1) + " blocks";
         }
         builder.setContentText(contentText);
 
@@ -83,6 +87,7 @@ public class NotificationsService extends BroadcastReceiver {
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         blockCount = preferences.getLong("block_count", 0L);
+        blockCountDay = preferences.getLong("block_count_day", 0L);
 
     }
 

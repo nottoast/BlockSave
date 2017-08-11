@@ -1,6 +1,9 @@
 package com.ast.blocksave;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,13 +30,15 @@ import android.widget.Toast;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
+import static com.ast.blocksave.NotificationsService.EVENING_NOTIFICATION_HOUR;
+import static com.ast.blocksave.NotificationsService.MIDDAY_NOTIFICATION_HOUR;
+import static com.ast.blocksave.NotificationsService.MORINNG_NOTIFICATION_HOUR;
 import static com.ast.blocksave.SetupActivity.BLOCKS_PER_DAY;
 
 public class DashboardActivity extends AppCompatActivity {
 
     public static int ELEVATION_HEIGHT = 6;
 
-    private String AMOUNT_SPENT_TEMPLATE_TEXT = "Enter amount spent:   " + Utils.getCurrencySymbol() ;
     private String TODAYS_BLOCKS_POSITIVE = "Blocks left to spend today:";
     private String TODAYS_BLOCKS_NEGATIVE = "Blocks you have over spent:";
     private long BLOCK_DISPLAY_LIMIT = 14;
@@ -76,6 +81,12 @@ public class DashboardActivity extends AppCompatActivity {
     private TextView blocksToSpendText;
     private TextView daysLeft;
 
+    private boolean morningNotification;
+    private boolean afternoonNotification;
+    private boolean eveningNotification;
+
+    private String currencySymbol;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,11 +97,17 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setContentView(R.layout.activity_dashboard);
+
         boolean continueToLoadActivity = loadData();
+
         if(continueToLoadActivity) {
+
             findDashboardScreenElements();
             calculateAndDisplayData();
             addListeners();
+
+            scheduleNotifications();
+
         } else {
             Intent intent = new Intent(getApplicationContext(), HelpActivity.class);
             startActivity(intent);
@@ -155,8 +172,8 @@ public class DashboardActivity extends AppCompatActivity {
                         }
 
                         builder.setMessage("Add purchase of "
-                                + Utils.getCurrencySymbol()
-                                + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + "?"
+                                + currencySymbol
+                                + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + " ?"
                                 + "\n\nThis will cost "
                                 + blocksToDeductString + "\n");
 
@@ -221,6 +238,10 @@ public class DashboardActivity extends AppCompatActivity {
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         setupDay = preferences.getLong("setup_day", 0L);
 
+        morningNotification = preferences.getBoolean("morning_notification", false);
+        afternoonNotification = preferences.getBoolean("afternoon_notification", false);
+        eveningNotification = preferences.getBoolean("evening_notification", false);
+
         return preferences.getBoolean("help_visited", false);
     }
 
@@ -251,6 +272,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     private void findDashboardScreenElements() {
 
+        currencySymbol = Utils.getCurrencySymbol(this);
+
         topLevelGridLayout = (GridLayout) findViewById(R.id.topLevelGridLayout);
 
         dayCountLayout = (GridLayout) findViewById(R.id.dayCountLayout);
@@ -278,7 +301,7 @@ public class DashboardActivity extends AppCompatActivity {
         overSpendOutput = (TextView) findViewById(R.id.overSpendOutput);
         tomorrowsBudgetOutput = (TextView) findViewById(R.id.tomorrowsBudgetOutput);
         amountSpentText = (TextView) findViewById(R.id.amountSpentText);
-        amountSpentText.setText(AMOUNT_SPENT_TEMPLATE_TEXT);
+        amountSpentText.setText("Enter amount spent:   " + currencySymbol);
         blocksToSpendText = (TextView) findViewById(R.id.blocksToSpendText);
         daysLeft = (TextView) findViewById(R.id.daysLeft);
     }
@@ -371,11 +394,15 @@ public class DashboardActivity extends AppCompatActivity {
         double staticBlockPrice = Double.valueOf(formatter.format(unformattedStaticBlockPrice));
 
         loadTodaysBlocksData();
+
         if(!Utils.isTheSameDay(blockCountDay, Calendar.getInstance().getTimeInMillis())) {
-            if(blockCount == 0L) {
+            if(blockCount <= 0L) {
                 blockCount = BLOCKS_PER_DAY;
             }
             blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
+            if(blockCount <= 0L) {
+                blockCount = BLOCKS_PER_DAY;
+            }
             blockCountDay = Calendar.getInstance().getTimeInMillis();
             saveTodaysBlocksData();
         }
@@ -385,7 +412,7 @@ public class DashboardActivity extends AppCompatActivity {
         long blocksToDeduct = 0L;
 
         if (!purchaseAmount.getText().toString().isEmpty()) {
-            blocksToDeduct = Utils.getBlocksToDeduct(totalMoneyToSpend, currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString()), staticBlockPrice, setupDay, nextPayDay, blockCount);
+            blocksToDeduct = Utils.getBlocksToDeduct(currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString()), staticBlockPrice, setupDay, nextPayDay, blockCount);
             calculatedBlocks.setText(blocksToDeduct + "");
         } else {
             calculatedBlocks.setText("0");
@@ -466,7 +493,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
                 overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
-                overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
+                //overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
 
             }
             /*
@@ -506,6 +533,56 @@ public class DashboardActivity extends AppCompatActivity {
         displayBlocks(blocksToShow, blocksToDeduct);
 
         return true;
+    }
+
+    private void scheduleNotifications() {
+
+        if(morningNotification) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, MORINNG_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, MORINNG_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(Calendar.getInstance(), MORINNG_NOTIFICATION_HOUR, false);
+        }
+
+        if(afternoonNotification) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, MIDDAY_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, MIDDAY_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(Calendar.getInstance(), MIDDAY_NOTIFICATION_HOUR, false);
+        }
+
+        if(eveningNotification) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, EVENING_NOTIFICATION_HOUR);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            scheduleNotification(calendar, EVENING_NOTIFICATION_HOUR, true);
+        } else {
+            scheduleNotification(Calendar.getInstance(), EVENING_NOTIFICATION_HOUR, false);
+        }
+
+    }
+
+    private void scheduleNotification(Calendar calendar, int notificationId, boolean run) {
+
+        Intent notificationIntent = new Intent(this, NotificationsService.class);
+        notificationIntent.putExtra(NotificationsService.NOTIFICATION_ID, notificationId);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        if(run) {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        } else {
+            alarmManager.cancel(pendingIntent);
+        }
     }
 
 }

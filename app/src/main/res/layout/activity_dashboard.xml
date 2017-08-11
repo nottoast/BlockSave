@@ -234,7 +234,7 @@
 
                 <TextView
                     android:id="@+id/underSpendTitleText1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="215dp"
                     android:layout_height="wrap_content"
                     android:text="To raise daily budget by"
                     android:textSize="15sp"
@@ -244,7 +244,6 @@
                     android:id="@+id/underSpendTitleText2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="50dp"
                     android:fontFamily="monospace"
                     android:text="  1 block"
                     android:textColor="@android:color/black"
@@ -262,7 +261,7 @@
 
                 <TextView
                     android:id="@+id/underSpendLayoutText1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="215dp"
                     android:layout_height="wrap_content"
                     android:text="Under spend today by "
                     android:textSize="15sp"
@@ -272,7 +271,6 @@
                     android:id="@+id/underSpendOutput"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="60dp"
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
                     android:textColor="@android:color/holo_green_dark"
@@ -290,7 +288,7 @@
 
                 <TextView
                     android:id="@+id/overSpendTitleText1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="215dp"
                     android:layout_height="wrap_content"
                     android:text="You will lower daily budget by"
                     android:textSize="15sp"
@@ -300,7 +298,6 @@
                     android:id="@+id/overSpendTitleText2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="13dp"
                     android:fontFamily="monospace"
                     android:text="  1 block"
                     android:textColor="@android:color/black"
@@ -318,7 +315,7 @@
 
                 <TextView
                     android:id="@+id/infoText6"
-                    android:layout_width="wrap_content"
+                    android:layout_width="215dp"
                     android:layout_height="wrap_content"
                     android:text="If you spend an aditional"
                     android:textSize="15sp"
@@ -328,7 +325,6 @@
                     android:id="@+id/overSpendOutput"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="46dp"
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
                     android:textColor="@android:color/holo_red_dark"
@@ -347,7 +343,7 @@
 
                 <TextView
                     android:id="@+id/infoText7"
-                    android:layout_width="wrap_content"
+                    android:layout_width="215dp"
                     android:layout_height="wrap_content"
                     android:text="Tomorrows budget is "
                     android:textAllCaps="false"
@@ -358,7 +354,6 @@
                     android:id="@+id/tomorrowsBudgetOutput"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="64dp"
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
                     android:textColor="@android:color/black"

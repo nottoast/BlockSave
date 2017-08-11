@@ -2,6 +2,7 @@ package com.ast.blocksave;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.telephony.TelephonyManager;
 import android.util.TypedValue;
 import android.widget.DatePicker;
 
@@ -143,9 +144,32 @@ public class Utils {
         return tomorrowsBlocksRounded;
     }
 
-    public static String getCurrencySymbol() {
-        Currency currency = Currency.getInstance(Locale.getDefault());
-        return currency.getSymbol();
+    public static String getCurrencySymbol(Context context) {
+
+        Currency currency = null;
+
+        try {
+
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+            String countryCode = telephonyManager.getNetworkCountryIso();
+            Locale locale = new Locale("en",countryCode.toUpperCase());
+            if (locale != null) {
+                currency = Currency.getInstance(locale);
+                return currency.getSymbol();
+            }
+
+            locale = context.getResources().getConfiguration().locale;
+            if (locale != null) {
+                currency = Currency.getInstance(locale);
+                return currency.getSymbol();
+            }
+
+            currency = Currency.getInstance(Locale.getDefault());
+            return currency.getSymbol();
+
+        } catch(Exception ex) {
+            return "$";
+        }
     }
 
     public static long getUnderSpendValue(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
@@ -174,22 +198,14 @@ public class Utils {
         return blockSpendValue.intValue();
     }
 
-    public static long getBlocksToDeduct(float totalMoneyToSpend, float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate, long todaysBlocks) {
+    public static long getBlocksToDeduct(float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate, long todaysBlocks) {
 
-        //double currentDisplayedBlocks = Math.round((currentMoneyToSpend) / staticBlockPrice);
         double currentDisplayedBlocks = getBlocksToDisplay(currentMoneyToSpend, setupDay, payDate, staticBlockPrice, todaysBlocks);
-
-        //double newDisplayBlocks = Math.round((currentMoneyToSpend - purchaseAmount) / staticBlockPrice);
         double newDisplayBlocks = getBlocksToDisplay(currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice, todaysBlocks);
 
         long blocksToDeduct = Math.round(currentDisplayedBlocks - newDisplayBlocks);
 
         return blocksToDeduct;
-    }
-
-    public static long getTotalBlocksAvailable(float totalMoneyToSpend, Double staticBlockPrice) {
-
-        return Math.round((totalMoneyToSpend) / staticBlockPrice);
     }
 
     public static java.util.Date getDateFromDatePicker(DatePicker datePicker) throws Exception {
