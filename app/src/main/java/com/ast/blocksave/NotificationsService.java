@@ -50,7 +50,7 @@ public class NotificationsService extends BroadcastReceiver {
                 tomorrowBlockCount = BLOCKS_PER_DAY;
             }
 
-            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
+            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
 
             if(blockCount <= 0L) {
                 blockCount = 1L;
@@ -63,7 +63,7 @@ public class NotificationsService extends BroadcastReceiver {
             saveTodaysBlocksData(context);
         }
 
-        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount, todaysBlockTotal);
+        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, staticBlockPrice, blockCount, todaysBlockTotal);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.drawable.ic_monetization_on_black_24dp);

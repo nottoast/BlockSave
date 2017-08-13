@@ -39,8 +39,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     public static int ELEVATION_HEIGHT = 6;
 
-    private String TODAYS_BLOCKS_POSITIVE = "Blocks left to spend today:";
-    private String TODAYS_BLOCKS_NEGATIVE = "Blocks you have over spent:";
+    private String TODAYS_BLOCKS_POSITIVE = "Your budget for today:";
+    private String TODAYS_BLOCKS_NEGATIVE = "You have overspent by:";
     private long BLOCK_DISPLAY_LIMIT = 14;
     private String OVER_SPEND_ZERO_TEXT = "Tomorrows budget is";
     private String OVER_SPEND_BLOCK_ZERO_TEXT = "  0 blocks";
@@ -427,7 +427,7 @@ public class DashboardActivity extends AppCompatActivity {
                 tomorrowBlockCount = BLOCKS_PER_DAY;
             }
 
-            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
+            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
 
             if(blockCount <= 0L) {
                 blockCount = 1L;
@@ -450,7 +450,7 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         String blocksToDisplayString = "";
-        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount, todaysBlockTotal);
+        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, staticBlockPrice, blockCount, todaysBlockTotal);
         long blocksToShow = blocksToDisplay;
 
         if (blocksToDisplay < 0) {
