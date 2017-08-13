@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
+import static com.ast.blocksave.SetupActivity.BLOCKS_PER_DAY;
+
 public class NotificationsService extends BroadcastReceiver {
 
     public static int MORINNG_NOTIFICATION_HOUR = 7;
@@ -19,11 +21,13 @@ public class NotificationsService extends BroadcastReceiver {
 
     public static String NOTIFICATION_ID = "notification-id";
 
-    private float totalMoneyToSpend;
     private float currentMoneyToSpend;
     private long nextPayDay;
-    private double staticBlockPrice;
+    private float staticBlockPrice;
+    private long todaysBlockTotal;
+
     private long blockCount;
+    private long tomorrowBlockCount;
     private long blockCountDay;
 
     @Override
@@ -35,14 +39,31 @@ public class NotificationsService extends BroadcastReceiver {
 
         loadData(context);
 
-        int numberOfDaysUntilPayDay = Utils.getNumberOfDaysUntilPayDay(nextPayDay);
+        boolean alternateNotificationText = Utils.isTwoDaysOrMoreBefore(blockCountDay, Calendar.getInstance().getTimeInMillis());
 
-        double unformattedStaticBlockPrice = Utils.getStaticBlockPrice(totalMoneyToSpend, numberOfDaysUntilPayDay);
+        if(!Utils.isTheSameDay(blockCountDay, Calendar.getInstance().getTimeInMillis())) {
 
-        DecimalFormat formatter = new DecimalFormat("#.00");
-        staticBlockPrice = Double.valueOf(formatter.format(unformattedStaticBlockPrice));
+            todaysBlockTotal = ((Double) Utils.getCurrentBlocksAvailable(currentMoneyToSpend, staticBlockPrice)).intValue();
+            saveTodaysBlockTotal(context);
 
-        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
+            if(tomorrowBlockCount <= 0L) {
+                tomorrowBlockCount = BLOCKS_PER_DAY;
+            }
+
+            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
+
+            if(blockCount <= 0L) {
+                blockCount = 1L;
+            }
+
+            if(!alternateNotificationText) {
+                blockCountDay = Calendar.getInstance().getTimeInMillis();
+            }
+
+            saveTodaysBlocksData(context);
+        }
+
+        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount, todaysBlockTotal);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setSmallIcon(R.drawable.ic_monetization_on_black_24dp);
@@ -58,8 +79,8 @@ public class NotificationsService extends BroadcastReceiver {
         builder.setContentTitle(contentTitle);
 
         String contentText = "";
-        if(!Utils.isTheSameDay(blockCountDay, Calendar.getInstance().getTimeInMillis())) {
-            contentText = "Please open BlockSave to see what today's budget is";
+        if(alternateNotificationText) {
+            contentText = "Please open BlockSave to see today's budget";
         } else if(blocksToDisplay > 1) {
             contentText = "You have " + blocksToDisplay + " blocks left to spend today";
         } else if(blocksToDisplay == 1) {
@@ -83,12 +104,31 @@ public class NotificationsService extends BroadcastReceiver {
 
         SharedPreferences preferences = context.getSharedPreferences("block_save_data", 0);
 
-        totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
+        staticBlockPrice = preferences.getFloat("static_block_price", 0.0F);
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         blockCount = preferences.getLong("block_count", 0L);
         blockCountDay = preferences.getLong("block_count_day", 0L);
+        tomorrowBlockCount = preferences.getLong("tomorrow_block_count", 10L);
+        todaysBlockTotal = preferences.getLong("todays_block_total", 0L);
 
+    }
+
+    private void saveTodaysBlocksData(Context context) {
+
+        SharedPreferences settings = context.getSharedPreferences("block_save_data", 0);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("block_count", blockCount);
+        editor.putLong("block_count_day", blockCountDay);
+        editor.commit();
+    }
+
+    private void saveTodaysBlockTotal(Context context) {
+        SharedPreferences settings = context.getSharedPreferences("block_save_data", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("todays_block_total", todaysBlockTotal);
+        editor.commit();
     }
 
 }

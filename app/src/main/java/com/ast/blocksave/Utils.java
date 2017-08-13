@@ -20,15 +20,15 @@ public class Utils {
 
     public static void main(String[] args) {
 
-        Float totalMoney = 300.0F;
-        Float currentMoney = 260.0F;
+        Float totalMoney = 200.0F;
+        Float currentMoney = 195.0F;
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date payDate = null;
         Date setupDate = null;
         try {
             payDate = sdf.parse("31/08/2017");
-            setupDate = sdf.parse("02/08/2017");
+            setupDate = sdf.parse("11/08/2017");
         } catch(Exception ex) {
         }
 
@@ -37,10 +37,9 @@ public class Utils {
 
         System.out.println("Number of days until pay day: " + getNumberOfDaysUntilPayDay(payDate.getTime()));
 
-        double staticBlockPrice = getStaticBlockPrice(totalMoney, daysDifference);
-        //System.out.println("Static block price: "+staticBlockPrice);
+        Float staticBlockPrice = getStaticBlockPrice(totalMoney, daysDifference);
 
-        System.out.println(getBlocksToDisplay(currentMoney, setupDate.getTime(), payDate.getTime(), staticBlockPrice, BLOCKS_PER_DAY));
+        //System.out.println(getBlocksToDisplay(currentMoney, staticBlockPrice, BLOCKS_PER_DAY, getCurrentBlocksAvailable(currentMoney, staticBlockPrice)));
         System.out.println(getBlockBudgetFromTomorrow(setupDate.getTime(), payDate.getTime(), currentMoney, staticBlockPrice));
         System.out.println("------------------------------------------------------");
 
@@ -100,27 +99,42 @@ public class Utils {
         return days + 1;
     }
 
-    public static double getStaticBlockPrice(double totalMoneyToSpend, int daysDifference) {
+    public static float getStaticBlockPrice(double totalMoneyToSpend, int daysDifference) {
 
         double staticBlockPrice = (totalMoneyToSpend / daysDifference) / BLOCKS_PER_DAY;
 
-        return staticBlockPrice;
+        return Float.parseFloat(staticBlockPrice+"");
     }
 
-    public static long getBlocksToDisplayRounded(double currentMoneyToSpend, long payDate, double staticBlockPrice, long todaysBlocks) {
+    public static double getCurrentBlocksAvailable(float currentMoneyToSpend, float staticBlockPrice) {
 
-        double currentBlocksAvailableInteger = Math.ceil((currentMoneyToSpend) / staticBlockPrice);
-        double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * todaysBlocks;
+        double currentBlocksAvailable = currentMoneyToSpend / staticBlockPrice;
+        double currentBlocksAvailableRounded = Math.ceil((currentBlocksAvailable));
 
-        return Math.round(currentBlocksAvailableInteger - blocksToDeduct);
+        return currentBlocksAvailableRounded;
     }
 
-    public static double getBlocksToDisplay(double currentMoneyToSpend, long setupDay, long payDate, double staticBlockPrice, long todaysBlocks) {
+    public static long getBlocksToDisplayRounded(float currentMoneyToSpend, long payDate, float staticBlockPrice, long todaysBlockBudget, long todaysTotalBlocks) {
 
-        double currentBlocksAvailableInteger = Math.ceil((currentMoneyToSpend) / staticBlockPrice);
-        double blocksToDeduct = (Utils.getNumberOfDaysUntilPayDay(payDate)-1) * todaysBlocks;
+        return Math.round(getBlocksToDisplay(currentMoneyToSpend, staticBlockPrice, todaysBlockBudget, todaysTotalBlocks));
+    }
 
-        return currentBlocksAvailableInteger - blocksToDeduct;
+    public static double getBlocksToDisplay(float currentMoneyToSpend, float staticBlockPrice, long todaysBlockBudget, long todaysTotalBlocks) {
+
+        double currentBlocksAvailableRounded = getCurrentBlocksAvailable(currentMoneyToSpend, staticBlockPrice);
+
+        double blockDifference = todaysTotalBlocks - currentBlocksAvailableRounded;
+
+        //int numberOfDaysUntilPayDay = Utils.getNumberOfDaysUntilPayDay(payDate)-1;
+        //double blocksToDeduct = numberOfDaysUntilPayDay * todaysBlocks;
+
+        //double remainingBlocks = currentBlocksAvailableRounded - blocksToDeduct;
+
+        //if(applyCutOff && remainingBlocks > todaysBlocks) {
+        //    remainingBlocks = todaysBlocks;
+        //}
+
+        return todaysBlockBudget - blockDifference;
     }
 
     public static double getDoubleBlockBudgetFromTomorrow(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
@@ -198,10 +212,10 @@ public class Utils {
         return blockSpendValue.intValue();
     }
 
-    public static long getBlocksToDeduct(float currentMoneyToSpend, Double purchaseAmount, Double staticBlockPrice, long setupDay, long payDate, long todaysBlocks) {
+    public static long getBlocksToDeduct(float currentMoneyToSpend, Double purchaseAmount, float staticBlockPrice, long payDate, long todaysBlockBudget, long todaysCurrentBlocks) {
 
-        double currentDisplayedBlocks = getBlocksToDisplay(currentMoneyToSpend, setupDay, payDate, staticBlockPrice, todaysBlocks);
-        double newDisplayBlocks = getBlocksToDisplay(currentMoneyToSpend - purchaseAmount, setupDay, payDate, staticBlockPrice, todaysBlocks);
+        double currentDisplayedBlocks = getBlocksToDisplay(currentMoneyToSpend, staticBlockPrice, todaysBlockBudget, todaysCurrentBlocks);
+        double newDisplayBlocks = getBlocksToDisplay((float)(currentMoneyToSpend - purchaseAmount), staticBlockPrice, todaysBlockBudget, todaysCurrentBlocks);
 
         long blocksToDeduct = Math.round(currentDisplayedBlocks - newDisplayBlocks);
 
@@ -222,6 +236,20 @@ public class Utils {
 
     public static boolean isTheSameDay(long blockCountDay, long currentTime) {
         if(roundDate(blockCountDay) == roundDate(currentTime)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isTwoDaysOrMoreBefore(long blockCountDay, long currentTime) {
+
+        long currentTimeToCompare = roundDate(currentTime);
+        long blockCountDayToCompare = roundDate(blockCountDay);
+
+        long dateDifference = currentTimeToCompare - blockCountDayToCompare;
+
+        if(dateDifference >= 172800000) {
             return true;
         } else {
             return false;
@@ -254,14 +282,6 @@ public class Utils {
 
         DecimalFormat formatter = new DecimalFormat("0.00");
         String value = formatter.format(floatValue);
-
-        return formatMonetaryValue(value);
-    }
-
-    public static String formatMonetaryValue(double doubleValue) {
-
-        DecimalFormat formatter = new DecimalFormat("0.00");
-        String value = formatter.format(doubleValue);
 
         return formatMonetaryValue(value);
     }

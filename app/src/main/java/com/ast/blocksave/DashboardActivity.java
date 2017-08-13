@@ -45,14 +45,16 @@ public class DashboardActivity extends AppCompatActivity {
     private String OVER_SPEND_ZERO_TEXT = "Tomorrows budget is";
     private String OVER_SPEND_BLOCK_ZERO_TEXT = "  0 blocks";
 
-    private float totalMoneyToSpend = 0.0F;
+    private float staticBlockPrice = 0.0F;
     private float currentMoneyToSpend = 0.0F;
 
     private long nextPayDay = 0L;
     private long setupDay = 0L;
 
-    private long blockCount = 0L;
+    private long tomorrowBlockCount = 10L;
+    private long blockCount = 10L;
     private long blockCountDay = 0L;
+    private long todaysBlockTotal = 0L;
 
     private LinearLayout blockDisplayLayoutTop;
     private LinearLayout blockDisplayLayoutBottom;
@@ -160,7 +162,9 @@ public class DashboardActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
 
-                    if(!purchaseAmount.getText().toString().isEmpty() && (currentMoneyToSpend - Float.valueOf(purchaseAmount.getText().toString()) > 0.0)) {
+                    if(!purchaseAmount.getText().toString().trim().isEmpty()
+                            && !purchaseAmount.getText().toString().trim().equals(".")
+                            && (currentMoneyToSpend - Float.valueOf(purchaseAmount.getText().toString().trim()) > 0.0)) {
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(DashboardActivity.this);
 
@@ -188,6 +192,7 @@ public class DashboardActivity extends AppCompatActivity {
                                 purchaseAmount.setText("");
                                 calculateAndDisplayData();
 
+
                                 int duration = Toast.LENGTH_SHORT;
                                 Toast toast = Toast.makeText(getApplicationContext(), "Purchase added", duration);
                                 toast.show();
@@ -202,13 +207,15 @@ public class DashboardActivity extends AppCompatActivity {
                         AlertDialog alert = builder.create();
                         alert.show();
 
-                    } else if(purchaseAmount.getText().toString().isEmpty()) {
+                    } else if(purchaseAmount.getText().toString().trim().isEmpty() || purchaseAmount.getText().toString().trim().equals(".")) {
 
                         int duration = Toast.LENGTH_SHORT;
                         Toast toast = Toast.makeText(getApplicationContext(), "Enter an amount to purchase", duration);
                         toast.show();
 
-                    } else if((currentMoneyToSpend - Float.valueOf(purchaseAmount.getText().toString()) <= 0.0)) {
+                    } else if(!purchaseAmount.getText().toString().trim().isEmpty()
+                            && !purchaseAmount.getText().toString().trim().equals(".")
+                            && (currentMoneyToSpend - Float.valueOf(purchaseAmount.getText().toString().trim()) <= 0.0)) {
 
                         int duration = Toast.LENGTH_SHORT;
                         Toast toast = Toast.makeText(getApplicationContext(), "You do not have enough money", duration);
@@ -233,7 +240,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
 
-        totalMoneyToSpend = preferences.getFloat("total_money_to_spend", 0.0F);
+        staticBlockPrice = preferences.getFloat("static_block_price", 0.0F);
         currentMoneyToSpend = preferences.getFloat("current_money_to_spend", 0.0F);
         nextPayDay = preferences.getLong("next_pay_day", 0L);
         setupDay = preferences.getLong("setup_day", 0L);
@@ -252,13 +259,26 @@ public class DashboardActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putFloat("current_money_to_spend", currentMoneyToSpend);
         editor.putBoolean("help_visited", true);
+        editor.putLong("tomorrow_block_count", tomorrowBlockCount);
+
+        editor.commit();
+    }
+
+    private void saveTomorrowBlockCountData() {
+
+        SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("tomorrow_block_count", tomorrowBlockCount);
 
         editor.commit();
     }
 
     private void loadTodaysBlocksData() {
         SharedPreferences preferences = getSharedPreferences("block_save_data", 0);
-        blockCount = preferences.getLong("block_count", 0L);
+        todaysBlockTotal = preferences.getLong("todays_block_total", 0L);
+        tomorrowBlockCount = preferences.getLong("tomorrow_block_count", 10L);
+        blockCount = preferences.getLong("block_count", 10L);
         blockCountDay = preferences.getLong("block_count_day", 0L);
     }
 
@@ -267,6 +287,13 @@ public class DashboardActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("block_count", blockCount);
         editor.putLong("block_count_day", blockCountDay);
+        editor.commit();
+    }
+
+    private void saveTodaysBlockTotal() {
+        SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("todays_block_total", todaysBlockTotal);
         editor.commit();
     }
 
@@ -388,22 +415,26 @@ public class DashboardActivity extends AppCompatActivity {
             return false;
         }
 
-        double unformattedStaticBlockPrice = Utils.getStaticBlockPrice(totalMoneyToSpend, numberOfDaysUntilPayDay);
-
-        DecimalFormat formatter = new DecimalFormat("#.00");
-        double staticBlockPrice = Double.valueOf(formatter.format(unformattedStaticBlockPrice));
-
         loadTodaysBlocksData();
 
         if(!Utils.isTheSameDay(blockCountDay, Calendar.getInstance().getTimeInMillis())) {
-            if(blockCount <= 0L) {
-                blockCount = BLOCKS_PER_DAY;
+
+            todaysBlockTotal = ((Double) Utils.getCurrentBlocksAvailable(currentMoneyToSpend, staticBlockPrice)).intValue();
+
+            saveTodaysBlockTotal();
+
+            if(tomorrowBlockCount <= 0L) {
+                tomorrowBlockCount = BLOCKS_PER_DAY;
             }
-            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
+
+            blockCount = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, tomorrowBlockCount, todaysBlockTotal);
+
             if(blockCount <= 0L) {
-                blockCount = BLOCKS_PER_DAY;
+                blockCount = 1L;
             }
+
             blockCountDay = Calendar.getInstance().getTimeInMillis();
+
             saveTodaysBlocksData();
         }
 
@@ -411,15 +442,15 @@ public class DashboardActivity extends AppCompatActivity {
 
         long blocksToDeduct = 0L;
 
-        if (!purchaseAmount.getText().toString().isEmpty()) {
-            blocksToDeduct = Utils.getBlocksToDeduct(currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString()), staticBlockPrice, setupDay, nextPayDay, blockCount);
+        if (!purchaseAmount.getText().toString().trim().isEmpty() && !purchaseAmount.getText().toString().trim().equals(".")) {
+            blocksToDeduct = Utils.getBlocksToDeduct(currentMoneyToSpend, Double.valueOf(purchaseAmount.getText().toString().trim()), staticBlockPrice, nextPayDay, blockCount, todaysBlockTotal);
             calculatedBlocks.setText(blocksToDeduct + "");
         } else {
             calculatedBlocks.setText("0");
         }
 
         String blocksToDisplayString = "";
-        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount);
+        long blocksToDisplay = Utils.getBlocksToDisplayRounded(currentMoneyToSpend, nextPayDay, staticBlockPrice, blockCount, todaysBlockTotal);
         long blocksToShow = blocksToDisplay;
 
         if (blocksToDisplay < 0) {
@@ -480,24 +511,11 @@ public class DashboardActivity extends AppCompatActivity {
                 overSpendOutput.setText(" " + overSpend + " blocks");
             }
 
-            long tomorrowsBudget = Utils.getBlockBudgetFromTomorrow(setupDay, nextPayDay, currentMoneyToSpend, staticBlockPrice);
+            tomorrowBlockCount = Utils.getBlockBudgetFromTomorrow(setupDay, nextPayDay, currentMoneyToSpend, staticBlockPrice);
 
-            if(tomorrowsBudget < 1) {
+            saveTomorrowBlockCountData();
 
-                tomorrowInfoLayout.removeView(blocksOverLayout);
-                tomorrowInfoLayout.removeView(overSpendLayout);
-
-                ViewGroup.LayoutParams layoutParams = tomorrowInfoLayout.getLayoutParams();
-                layoutParams.height = Utils.convertDpToPixels(132.0F, this.getApplicationContext());
-                tomorrowInfoLayout.setLayoutParams(layoutParams);
-
-                overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
-                overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
-                //overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
-
-            }
-            /*
-            else if(underSpend > blocksToShow) {
+            if(tomorrowBlockCount < 1) {
 
                 tomorrowInfoLayout.removeView(blocksOverLayout);
                 tomorrowInfoLayout.removeView(overSpendLayout);
@@ -508,22 +526,19 @@ public class DashboardActivity extends AppCompatActivity {
 
                 overSpendTitleText1.setText(OVER_SPEND_ZERO_TEXT);
                 overSpendTitleText2.setText(OVER_SPEND_BLOCK_ZERO_TEXT);
-                overSpendTitleText2.setPadding(Utils.convertDpToPixels(54F, this.getApplicationContext()),0,0,0);
 
-            }
-            */
-            else {
+            } else {
 
-                if (tomorrowsBudget < 10) {
-                    if (tomorrowsBudget == 1) {
-                        tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " block");
+                if (tomorrowBlockCount < 10) {
+                    if (tomorrowBlockCount == 1) {
+                        tomorrowsBudgetOutput.setText("  " + tomorrowBlockCount + " block");
                     } else {
-                        tomorrowsBudgetOutput.setText("  " + tomorrowsBudget + " blocks");
+                        tomorrowsBudgetOutput.setText("  " + tomorrowBlockCount + " blocks");
                     }
-                } else if (tomorrowsBudget > 99) {
+                } else if (tomorrowBlockCount > 99) {
                     tomorrowsBudgetOutput.setText("99+ blocks");
                 } else {
-                    tomorrowsBudgetOutput.setText(" " + tomorrowsBudget + " blocks");
+                    tomorrowsBudgetOutput.setText(" " + tomorrowBlockCount + " blocks");
                 }
 
             }

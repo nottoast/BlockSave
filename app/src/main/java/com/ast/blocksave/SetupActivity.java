@@ -60,7 +60,8 @@ public class SetupActivity extends AppCompatActivity {
     private Button saveButton;
     private Button continueButton;
 
-    private String staticBlockPrice = "0.00";
+    private Float staticBlockPrice = 0.0F;
+    private String formattedStaticBlockPrice = "0.00";
 
     private CheckBox morningCheckbox;
     private CheckBox afternoonCheckbox;
@@ -178,7 +179,7 @@ public class SetupActivity extends AppCompatActivity {
                     try {
                         builder.setMessage("Manage spending of " + currencySymbol + Utils.formatMonetaryValue(totalMoneyToSpend)
                                 + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?"
-                                + "\n\nA single block will be worth " + currencySymbol + staticBlockPrice + "\n");
+                                + "\n\nA single block will be worth " + currencySymbol + formattedStaticBlockPrice + "\n");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -315,16 +316,25 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void saveData() {
+
         setupDate = Calendar.getInstance().getTimeInMillis();
+
         SharedPreferences settings = getSharedPreferences("block_save_data", 0);
         SharedPreferences.Editor editor = settings.edit();
+
+        editor.putFloat("static_block_price", staticBlockPrice);
         editor.putFloat("total_money_to_spend", totalMoneyToSpend);
         editor.putFloat("current_money_to_spend", totalMoneyToSpend);
+
         editor.putLong("next_pay_day", payDate);
         editor.putLong("setup_day", setupDate);
-        editor.putBoolean("help_visited", true);
+
+        editor.putLong("todays_block_total", 0L);
         editor.putLong("block_count", BLOCKS_PER_DAY);
-        editor.putLong("block_count_day", setupDate);
+        editor.putLong("tomorrow_block_count", BLOCKS_PER_DAY);
+        editor.putLong("block_count_day", 0L);
+
+        editor.putBoolean("help_visited", true);
 
         if(morningCheckbox.isChecked()) {
             morningNotification = true;
@@ -357,11 +367,12 @@ public class SetupActivity extends AppCompatActivity {
 
             int daysDifference = Utils.getDaysDifference(setupDate, payDate);
 
-            staticBlockPrice = Utils.formatMonetaryValue(Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference));
-            if(staticBlockPrice == null || staticBlockPrice.equals("") || staticBlockPrice.equals("-.00")) {
-                staticBlockPrice = "0.00";
+            staticBlockPrice = Utils.getStaticBlockPrice(totalMoneyToSpend, daysDifference);
+            formattedStaticBlockPrice = Utils.formatMonetaryValue(staticBlockPrice);
+            if(formattedStaticBlockPrice == null || formattedStaticBlockPrice.equals("") || formattedStaticBlockPrice.equals("-.00")) {
+                formattedStaticBlockPrice = "0.00";
             }
-            blockValueText.setText("A block is worth  " + currencySymbol + staticBlockPrice);
+            blockValueText.setText("A block is worth  " + currencySymbol + formattedStaticBlockPrice);
         } catch(Exception ex) {
 
         }
