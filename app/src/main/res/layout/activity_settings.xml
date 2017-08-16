@@ -138,7 +138,7 @@
 
             <Button
                 android:id="@+id/saveButton"
-                android:layout_width="50dp"
+                android:layout_width="45dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:layout_weight="0.11"
