@@ -39,8 +39,8 @@ public class DashboardActivity extends AppCompatActivity {
 
     public static int ELEVATION_HEIGHT = 6;
 
-    private String TODAYS_BLOCKS_POSITIVE = "Your budget for today:";
-    private String TODAYS_BLOCKS_NEGATIVE = "You have overspent by:";
+    private String TODAYS_BLOCKS_POSITIVE = "Your budget for today is";
+    private String TODAYS_BLOCKS_NEGATIVE = "You have overspent by";
     private long BLOCK_DISPLAY_LIMIT = 14;
     private String OVER_SPEND_ZERO_TEXT = "Tomorrows budget is";
     private String OVER_SPEND_BLOCK_ZERO_TEXT = "  0 blocks";
@@ -127,13 +127,21 @@ public class DashboardActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if (id == R.id.action_setup) {
+        if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
+
+            return true;
+        } else if (id == R.id.action_setup) {
 
             Intent intent = new Intent(getApplicationContext(), SetupActivity.class);
             startActivity(intent);
             return true;
 
-        } else if (id == R.id.action_help) {
+        }
+        /*
+        else if (id == R.id.action_help) {
 
             SharedPreferences settings = getSharedPreferences("block_save_data", 0);
             SharedPreferences.Editor editor = settings.edit();
@@ -147,7 +155,7 @@ public class DashboardActivity extends AppCompatActivity {
             this.finishAffinity();
             return true;
         }
-
+        */
         return super.onOptionsItemSelected(item);
     }
 
@@ -177,7 +185,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                         builder.setMessage("Add purchase of "
                                 + currencySymbol
-                                + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + " ?"
+                                + Utils.formatMonetaryValue(purchaseAmount.getText().toString()) + "?"
                                 + "\n\nThis will cost "
                                 + blocksToDeductString + "\n");
 
@@ -479,7 +487,11 @@ public class DashboardActivity extends AppCompatActivity {
 
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-            blocksToSpendToday.setText("None");
+            blocksToSpendToday.setText("0");
+
+            ViewGroup.LayoutParams layoutParams = blocksToSpendLayout.getLayoutParams();
+            layoutParams.height = Utils.convertDpToPixels(47.0F, this.getApplicationContext());
+            blocksToSpendLayout.setLayoutParams(layoutParams);
 
         }
 

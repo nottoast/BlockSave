@@ -25,6 +25,10 @@
             android:name=".HelpActivity"
             android:launchMode="singleTask">
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:launchMode="singleTask">
+        </activity>
 
         <receiver android:name=".NotificationsService"/>
 

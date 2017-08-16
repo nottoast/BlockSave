@@ -72,11 +72,11 @@
 
             <Button
                 android:id="@+id/continueButton"
-                android:layout_width="100dp"
+                android:layout_width="110dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
-                android:text="Continue"
-                android:layout_weight="0.03" />
+                android:layout_weight="0.03"
+                android:text="Continue" />
 
         </LinearLayout>
 

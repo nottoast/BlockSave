@@ -1,14 +1,9 @@
 package com.ast.blocksave;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -27,10 +22,6 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import static com.ast.blocksave.NotificationsService.EVENING_NOTIFICATION_HOUR;
-import static com.ast.blocksave.NotificationsService.MIDDAY_NOTIFICATION_HOUR;
-import static com.ast.blocksave.NotificationsService.MORINNG_NOTIFICATION_HOUR;
 
 public class SetupActivity extends AppCompatActivity {
 
@@ -95,7 +86,7 @@ public class SetupActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_setup, menu);
         return true;
     }
 
@@ -108,7 +99,15 @@ public class SetupActivity extends AppCompatActivity {
             startActivity(intent);
 
             return true;
-        } else if (id == R.id.action_help) {
+        } else if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
+
+            return true;
+        }
+        /*
+        else if (id == R.id.action_help) {
 
             SharedPreferences settings = getSharedPreferences("block_save_data", 0);
             SharedPreferences.Editor editor = settings.edit();
@@ -119,12 +118,15 @@ public class SetupActivity extends AppCompatActivity {
             startActivity(intent);
 
             return true;
-        } else if (id == R.id.action_exit) {
+        }
+        */
+        else if (id == R.id.action_exit) {
 
             this.finishAffinity();
 
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -179,7 +181,8 @@ public class SetupActivity extends AppCompatActivity {
                     try {
                         builder.setMessage("Manage spending of " + currencySymbol + Utils.formatMonetaryValue(totalMoneyToSpend)
                                 + " for " + Utils.getDaysDifference(setupDate, payDate) + " days?"
-                                + "\n\nA single block will be worth " + currencySymbol + formattedStaticBlockPrice + "\n");
+                                + "\n\nA single block will be worth " + currencySymbol + formattedStaticBlockPrice
+                                + "\n\nThis will overwrite any currently saved data\n");
 
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -231,6 +234,7 @@ public class SetupActivity extends AppCompatActivity {
                 return false;
             }
         });
+
     }
 
     private void findDateSetupScreenElements() {
@@ -338,6 +342,16 @@ public class SetupActivity extends AppCompatActivity {
 
         editor.putBoolean("help_visited", true);
 
+        editor.commit();
+
+        saveNotificationData();
+    }
+
+    private void saveNotificationData() {
+
+        SharedPreferences settings = getSharedPreferences("block_save_data", 0);
+        SharedPreferences.Editor editor = settings.edit();
+
         if(morningCheckbox.isChecked()) {
             morningNotification = true;
             editor.putBoolean("morning_notification", true);
@@ -361,6 +375,7 @@ public class SetupActivity extends AppCompatActivity {
         }
 
         editor.commit();
+
     }
 
     private void calculateAndDisplayData() {

@@ -65,8 +65,8 @@
                     android:id="@+id/blocksToSpendText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="8dp"
-                    android:text="Blocks to spend today:"
+                    android:paddingRight="7dp"
+                    android:text="Your budget for today"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -113,7 +113,7 @@
         <GridLayout
             android:id="@+id/purchaseEntryGridLayout"
             android:layout_width="match_parent"
-            android:layout_height="111dp"
+            android:layout_height="112dp"
             android:layout_column="0"
             android:layout_marginBottom="12dp"
             android:layout_marginLeft="8dp"
@@ -129,7 +129,7 @@
                 android:layout_height="40dp"
                 android:layout_column="0"
                 android:layout_marginBottom="4dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="9dp"
                 android:layout_row="0"
                 android:orientation="horizontal"
                 android:paddingLeft="8dp"
@@ -140,7 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="4dp"
-                    android:text="Enter amount spent:   $"
+                    android:text="Enter amount spent   $"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -154,7 +154,7 @@
                     android:ems="10"
                     android:hint="0.00"
                     android:inputType="numberDecimal"
-                    android:paddingTop="8dp"
+                    android:paddingTop="5dp"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -181,9 +181,9 @@
                     android:id="@+id/infoText3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="24dp"
-                    android:paddingRight="8dp"
-                    android:text="Block value:"
+                    android:layout_marginLeft="18dp"
+                    android:paddingRight="6dp"
+                    android:text="Block value is"
                     android:textSize="17sp"
                     android:textStyle="italic" />
 
@@ -192,7 +192,7 @@
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.31"
-                    android:paddingRight="16dp"
+                    android:paddingRight="20dp"
                     android:text="0"
                     android:textSize="17sp"
                     android:textStyle="italic" />
@@ -222,7 +222,7 @@
                 android:layout_row="0"
                 android:text="Tomorrow"
                 android:textSize="16sp"
-                android:textStyle="bold|italic" />
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/underSpendTitle"
@@ -235,7 +235,7 @@
 
                 <TextView
                     android:id="@+id/underSpendTitleText1"
-                    android:layout_width="203dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="To raise daily budget by"
                     android:textSize="15sp"
@@ -247,8 +247,9 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
                     android:text="  1 block"
-                    android:textColor="@android:color/black"
-                    android:textSize="15sp" />
+                    android:textColor="?attr/editTextColor"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
             </LinearLayout>
 
             <LinearLayout
@@ -262,7 +263,7 @@
 
                 <TextView
                     android:id="@+id/underSpendLayoutText1"
-                    android:layout_width="203dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="Under spend today by "
                     android:textSize="15sp"
@@ -275,7 +276,8 @@
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
                     android:textColor="@android:color/holo_green_dark"
-                    android:textSize="15sp" />
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
             </LinearLayout>
 
             <LinearLayout
@@ -289,7 +291,7 @@
 
                 <TextView
                     android:id="@+id/overSpendTitleText1"
-                    android:layout_width="203dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="You will lower daily budget by"
                     android:textSize="15sp"
@@ -301,8 +303,9 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
                     android:text="  1 block"
-                    android:textColor="@android:color/black"
-                    android:textSize="15sp" />
+                    android:textColor="?attr/editTextColor"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
             </LinearLayout>
 
             <LinearLayout
@@ -316,7 +319,7 @@
 
                 <TextView
                     android:id="@+id/infoText6"
-                    android:layout_width="203dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="If you spend an aditional"
                     android:textSize="15sp"
@@ -329,7 +332,8 @@
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
                     android:textColor="@android:color/holo_red_dark"
-                    android:textSize="15sp" />
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
 
             </LinearLayout>
 
@@ -344,7 +348,7 @@
 
                 <TextView
                     android:id="@+id/infoText7"
-                    android:layout_width="203dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:text="Tomorrows budget is "
                     android:textAllCaps="false"
@@ -357,8 +361,9 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
                     android:text="  0 blocks"
-                    android:textColor="@android:color/black"
-                    android:textSize="15sp" />
+                    android:textColor="?attr/editTextColor"
+                    android:textSize="14sp"
+                    android:textStyle="italic" />
             </LinearLayout>
 
         </GridLayout>

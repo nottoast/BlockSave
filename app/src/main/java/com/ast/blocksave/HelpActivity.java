@@ -45,7 +45,9 @@ public class HelpActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
+        /*
         if (id == R.id.action_dashboard) {
 
             saveData();
@@ -53,7 +55,9 @@ public class HelpActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_setup) {
+        } else
+        */
+        if (id == R.id.action_setup) {
 
             saveData();
 

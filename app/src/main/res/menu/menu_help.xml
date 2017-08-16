@@ -2,13 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".application.MessengerActivity">
 
-    <item android:id="@+id/action_dashboard" android:title="@string/action_dashboard"
-        android:orderInCategory="100" app:showAsAction="never" />
-
-    <item android:id="@+id/action_setup" android:title="@string/action_settings"
-        android:orderInCategory="200" app:showAsAction="never" />
+    <item android:id="@+id/action_setup" android:title="@string/action_setup"
+        android:orderInCategory="300" app:showAsAction="never" />
 
     <item android:id="@+id/action_exit" android:title="@string/action_exit"
-        android:orderInCategory="300" app:showAsAction="never" />
+        android:orderInCategory="400" app:showAsAction="never" />
 
 </menu>
