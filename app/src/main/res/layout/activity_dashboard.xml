@@ -189,9 +189,10 @@
 
                 <TextView
                     android:id="@+id/calculatedBlocks"
-                    android:layout_width="38dp"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.31"
+                    android:paddingRight="16dp"
                     android:text="0"
                     android:textSize="17sp"
                     android:textStyle="italic" />
@@ -234,7 +235,7 @@
 
                 <TextView
                     android:id="@+id/underSpendTitleText1"
-                    android:layout_width="210dp"
+                    android:layout_width="203dp"
                     android:layout_height="wrap_content"
                     android:text="To raise daily budget by"
                     android:textSize="15sp"
@@ -261,7 +262,7 @@
 
                 <TextView
                     android:id="@+id/underSpendLayoutText1"
-                    android:layout_width="210dp"
+                    android:layout_width="203dp"
                     android:layout_height="wrap_content"
                     android:text="Under spend today by "
                     android:textSize="15sp"
@@ -288,7 +289,7 @@
 
                 <TextView
                     android:id="@+id/overSpendTitleText1"
-                    android:layout_width="210dp"
+                    android:layout_width="203dp"
                     android:layout_height="wrap_content"
                     android:text="You will lower daily budget by"
                     android:textSize="15sp"
@@ -315,7 +316,7 @@
 
                 <TextView
                     android:id="@+id/infoText6"
-                    android:layout_width="210dp"
+                    android:layout_width="203dp"
                     android:layout_height="wrap_content"
                     android:text="If you spend an aditional"
                     android:textSize="15sp"
@@ -343,7 +344,7 @@
 
                 <TextView
                     android:id="@+id/infoText7"
-                    android:layout_width="210dp"
+                    android:layout_width="203dp"
                     android:layout_height="wrap_content"
                     android:text="Tomorrows budget is "
                     android:textAllCaps="false"

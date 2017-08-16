@@ -280,7 +280,9 @@ public class SetupActivity extends AppCompatActivity {
         saveLayout.setElevation(DashboardActivity.ELEVATION_HEIGHT);
 
         budget = (EditText) findViewById(R.id.budget);
-        budget.setText(Utils.formatMonetaryValue(currentMoneyToSpend));
+        if(!Utils.formatMonetaryValue(currentMoneyToSpend).equals("0.00")) {
+            budget.setText(Utils.formatMonetaryValue(currentMoneyToSpend));
+        }
         saveButton = (Button) findViewById(R.id.saveButton);
         blockValueText = (TextView) findViewById(R.id.blockValueText);
         currency1 = (TextView) findViewById(R.id.currency1);

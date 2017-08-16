@@ -460,6 +460,10 @@ public class DashboardActivity extends AppCompatActivity {
             blocksToSpendToday.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark));
             blocksToSpendToday.setText(blocksToDisplay + "");
 
+            ViewGroup.LayoutParams layoutParams = blocksToSpendLayout.getLayoutParams();
+            layoutParams.height = Utils.convertDpToPixels(47.0F, this.getApplicationContext());
+            blocksToSpendLayout.setLayoutParams(layoutParams);
+
         } else if (blocksToDisplay > 0) {
 
             blocksToSpendText.setText(TODAYS_BLOCKS_POSITIVE);
