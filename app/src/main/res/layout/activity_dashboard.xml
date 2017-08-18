@@ -140,7 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingRight="4dp"
-                    android:text="Enter amount spent   $"
+                    android:text="Enter amount spent  $"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 

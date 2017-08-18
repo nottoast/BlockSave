@@ -336,7 +336,7 @@ public class DashboardActivity extends AppCompatActivity {
         overSpendOutput = (TextView) findViewById(R.id.overSpendOutput);
         tomorrowsBudgetOutput = (TextView) findViewById(R.id.tomorrowsBudgetOutput);
         amountSpentText = (TextView) findViewById(R.id.amountSpentText);
-        amountSpentText.setText("Enter amount spent:   " + currencySymbol);
+        amountSpentText.setText("Enter amount spent  " + currencySymbol);
         blocksToSpendText = (TextView) findViewById(R.id.blocksToSpendText);
         daysLeft = (TextView) findViewById(R.id.daysLeft);
     }
