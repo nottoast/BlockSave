@@ -114,29 +114,34 @@ public class Utils {
     public static String getCurrencySymbol(Context context) {
 
         Currency currency = null;
+        Locale locale = null;
 
         try {
-
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
             String countryCode = telephonyManager.getNetworkCountryIso();
-            Locale locale = new Locale("en",countryCode.toUpperCase());
+            locale = new Locale("en",countryCode.toUpperCase());
             if (locale != null) {
                 currency = Currency.getInstance(locale);
                 return currency.getSymbol();
             }
-
-            locale = context.getResources().getConfiguration().locale;
-            if (locale != null) {
-                currency = Currency.getInstance(locale);
-                return currency.getSymbol();
+        } catch(Exception ex1) {
+            try {
+                locale = context.getResources().getConfiguration().locale;
+                if (locale != null) {
+                    currency = Currency.getInstance(locale);
+                    return currency.getSymbol();
+                }
+            } catch(Exception ex2) {
+                try {
+                    currency = Currency.getInstance(Locale.getDefault());
+                    return currency.getSymbol();
+                } catch(Exception ex3) {
+                    return "$";
+                }
             }
-
-            currency = Currency.getInstance(Locale.getDefault());
-            return currency.getSymbol();
-
-        } catch(Exception ex) {
-            return "$";
         }
+
+        return "$";
     }
 
     public static long getUnderSpendValue(long setupDay, long payDate, double currentMoneyToSpend, double staticBlockPrice) {
